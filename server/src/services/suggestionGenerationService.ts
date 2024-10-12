@@ -9,43 +9,69 @@ export default class SuggestionGenerationService {
 
     public async generate(suggestions: Array<string>) {
 
-        const prompt = `
-            As an AI assistant for a search engine application, your task is to generate 4 compelling and diverse search suggestions based on the following themes: ${suggestions.join(', ')}.
-
-            Requirements:
-            1. Create exactly 4 suggestions, each focusing on a single theme from the provided list.
-            2. Each suggestion should be concise, between 3-6 words long, and formulated as a search query.
-            3. Ensure all suggestions are unique and avoid repetition.
-            4. Make the suggestions specific, intriguing, and likely to spark the user's curiosity.
-            5. Incorporate current trends, popular topics, or interesting angles related to each theme when applicable.
-
-            Output Format:
-            - Provide the result as a valid JSON object.
-            - Each key should be a theme from the input list.
-            - Each value should be the corresponding search suggestion.
-
-            Example Output:
+        const aiMsg = await this.llmInstance.invoke([
             {
-                "cooking": "innovative vegan dessert recipes",
-                "travel": "hidden gems in Southeast Asia",
-                "art": "emerging street artists 2024",
-                "programming": "AI-powered code refactoring techniques"
-            }
-
-            Generate diverse and engaging suggestions that will encourage users to explore their interests further.
-        `;
-
-        const response = await this.llmInstance.invoke([
+                role: "system",
+                content: `
+                    You are a highly creative AI assistant for a search engine application. Your task is to generate compelling and diverse search suggestions based on the user's themes.
+                    Your suggestions must be concise, engaging, and based on current trends or unique aspects of each theme.
+                `,
+            },
             {
                 role: "user",
-                content: prompt
-            }
+                content: `
+                    Here are the themes I want suggestions for: ${suggestions.join(', ')}.
+                    
+                    Requirements:
+                    1. Generate exactly 4 search suggestions, each focusing on a different theme from the provided list.
+                    2. Each suggestion should be between 3-6 words long and be formulated as a search query.
+                    3. Avoid repetition. Make each suggestion unique and intriguing.
+                    4. Use current trends, niche topics, or interesting angles for each theme.
+            
+                    Example Output:
+                    {
+                        "cooking": "2024's best vegan recipes",
+                        "travel": "hidden gems in South America",
+                        "art": "modern art movements of 2024",
+                        "technology": "AI breakthroughs in medical research",
+                        "trip": "eco-friendly travel destinations 2024",
+                        "programming": "trending programming languages to learn",
+                        "politics": "impact of youth voting trends 2024",
+                        "sport": "emerging sports leagues to watch",
+                        "music": "best underground artists of 2024",
+                        "cooking": "quick meal prep ideas for busy nights",
+                        "travel": "ultimate guide to solo travel",
+                        "art": "top art festivals to visit this year",
+                        "technology": "future of quantum computing",
+                        "trip": "best scenic drives in Europe",
+                        "programming": "top open-source projects to contribute to",
+                        "politics": "latest developments in climate policy",
+                        "sport": "best athletes to watch in 2024",
+                        "music": "influential albums of the decade",
+                        "cooking": "healthy meal plans for beginners",
+                        "travel": "unique cultural experiences around the world",
+                        "art": "impact of digital art on traditional media",
+                        "technology": "how 5G will change communication",
+                        "trip": "affordable travel hacks for families",
+                        "programming": "how to master data science",
+                        "politics": "global implications of recent elections",
+                        "sport": "upcoming events in extreme sports",
+                        "music": "music trends to watch in 2024",
+                        "trip": "adventurous road trips in 2024",
+                        "programming": "AI ethics in software development",
+                        "politics": "impact of social media on elections",
+                        "sport": "innovative training techniques in athletics"
+                    }
+
+                    Please return the result as a JSON object with themes as keys and search suggestions as values.
+                `,
+                },
         ]);
 
-        const startIndex = response.content.toString().indexOf('{');
-        const endIndex = response.content.toString().lastIndexOf('}') + 1;
+        const startIndex = aiMsg.content.toString().indexOf('{');
+        const endIndex = aiMsg.content.toString().lastIndexOf('}') + 1;
 
-        const formattedResponse = JSON.parse(response.content.toString().slice(startIndex, endIndex));
+        const formattedResponse = JSON.parse(aiMsg.content.toString().slice(startIndex, endIndex));
         
         return formattedResponse; 
     }
