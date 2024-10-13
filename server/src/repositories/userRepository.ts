@@ -40,4 +40,8 @@ export default class UserRepository implements IUserRepository {
         return themesNames;
     }
 
-}   
+    public async getThemes(): Promise<Array<ITheme>> {
+        return await this.dbConnection('themes');
+    }
+
+}

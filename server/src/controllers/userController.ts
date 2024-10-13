@@ -31,4 +31,11 @@ export default class UserController {
             data: suggestions 
         })
     }
+
+    public async getThemes(req: Request, res: Response) {
+        const themes = await this.userRepository.getThemes();
+        return res.status(200).json({
+            data: themes
+        })
+    }
 }
