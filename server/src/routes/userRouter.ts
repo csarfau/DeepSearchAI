@@ -11,5 +11,6 @@ const userController = new UserController(userRepository);
 userRouter.get('/user/:id', (req, res) => userController.test(req, res));
 userRouter.post('/user/:id/themes', (req, res) => userController.saveThemeSuggestions(req, res));
 userRouter.get('/user/:id/suggestions', (req, res) => userController.getUsersSuggestions(req, res));
+userRouter.get('/themes', (req, res) => userController.getThemes(req, res));
 
 export default userRouter;
