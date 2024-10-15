@@ -2,9 +2,6 @@ import { IUser, IUserRepository } from '../types/user';
 import { CustomError } from '../helpers/customError';
 import { Knex } from 'knex';
 import { IUserTheme, ITheme } from '../types/user';
-import { compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
-import authConfig from '../utils/auth';
 
 export default class UserRepository implements IUserRepository {
 
@@ -12,27 +9,7 @@ export default class UserRepository implements IUserRepository {
 
     public async createUser(user: IUser): Promise<Partial<IUser>> {
         const newUser = await this.dbConnection('users').insert(user).returning('*');
-        console.log(newUser);
         return newUser[0];
-    }
-
-    public async login(credentials: Partial<IUser>): Promise<string> {
-        const user = await this.dbConnection('users').where('email', credentials.email).first();
-        if(!user) {
-            return "Credentials not found."
-        }
-        
-        const comparePassword = await compare(String(credentials.password), user.password);
-        if(!comparePassword) {
-            return "Credentials not found.";
-        }
-
-        const token = sign({}, authConfig.jwt.secret, {
-            subject: user.id,
-            expiresIn: authConfig.jwt.expiresIn
-        });
-
-        return token;
     }
 
     public async getUserByID(userID: string):Promise<Partial<IUser> | undefined > {
@@ -44,6 +21,17 @@ export default class UserRepository implements IUserRepository {
         
         return user
     }
+
+    public async getUserByEmail(userEmail: string):Promise<Partial<IUser> | undefined > {
+
+        const user = await this.dbConnection('users')
+            .select('id', 'password', 'email')
+            .where({email: userEmail})
+            .first();
+        
+        return user
+    }
+
 
     public async insertUsersTheme(userID: string, themesIDs:Array<string>):Promise<Array<IUserTheme>> {
 
