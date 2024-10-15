@@ -6,8 +6,20 @@ export interface IUser {
     password: string
 }
 
+export interface ILoginTokenPayload {
+    id: string;
+    email: string;
+}
+declare module 'express-serve-static-core' {
+        interface Request {
+        user?: ILoginTokenPayload;
+    }
+}
+
 export interface IUserRepository {
+    createUser(userData: IUser): Promise<Partial<IUser> | undefined>;
     getUserByID(userID: string): Promise<Partial<IUser> | undefined>;
+    getUserByEmail(userEmail: string): Promise<Partial<IUser> | undefined>;
     insertUsersTheme(userID: string, themesIDs:Array<string>):Promise<Array<UserTheme>>
     getUsersThemes(userID: string): Promise<Array<string>>
     getThemes(): Promise<Array<Theme>>
