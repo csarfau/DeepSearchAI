@@ -7,6 +7,11 @@ export default class UserRepository implements IUserRepository {
 
     constructor(private readonly dbConnection: Knex) {}
 
+    public async createUser(user: IUser): Promise<Partial<IUser>> {
+        const newUser = await this.dbConnection('users').insert(user).returning('*');
+        return newUser[0];
+    }
+
     public async getUserByID(userID: string):Promise<Partial<IUser> | undefined > {
 
         const user = await this.dbConnection('users')
@@ -16,6 +21,17 @@ export default class UserRepository implements IUserRepository {
         
         return user
     }
+
+    public async getUserByEmail(userEmail: string):Promise<Partial<IUser> | undefined > {
+
+        const user = await this.dbConnection('users')
+            .select('id', 'password', 'email')
+            .where({email: userEmail})
+            .first();
+        
+        return user
+    }
+
 
     public async insertUsersTheme(userID: string, themesIDs:Array<string>):Promise<Array<IUserTheme>> {
 
