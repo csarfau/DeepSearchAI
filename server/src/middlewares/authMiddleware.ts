@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verify } from 'jsonwebtoken';
-import auth from '../utils/auth';
+import { verifyToken } from '../utils/token';
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => { 
   const authHeader = req.headers.authorization;
@@ -11,7 +10,13 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   const token = authHeader.split(' ')[1];
 
   try {
-    verify(token, auth.jwt.secret);
+    const authenticatedUser = verifyToken(token);
+    if(!authenticatedUser) {
+      throw new Error();
+    }
+
+    req.user = { id: authenticatedUser.id, email: authenticatedUser.email }
+
     return next();
 
   } catch (error) {

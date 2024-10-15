@@ -5,6 +5,7 @@ import llm from '../openIA/chatOpenIA'
 import bcrypt, { compare } from 'bcrypt';
 import knex, { Knex } from 'knex';
 import { sign } from 'jsonwebtoken';
+import { createToken } from '../utils/token';
 
 export default class UserController {
 
@@ -18,7 +19,6 @@ export default class UserController {
         const { name, email, password } = req.body;
 
         const user: IUser = {
-            name,
             email,
             password: await bcrypt.hash(password, 10)
         }
@@ -30,8 +30,17 @@ export default class UserController {
 
     public async login(req: Request, res: Response) {
         const { email, password } = req.body;
-        const credentials = { email, password };
-        const token = await this.userRepository.login(credentials);
+        const user = await this.userRepository.getUserByEmail(email);
+        if(!user) {
+            return "Credentials not found."
+        }
+
+        const comparePassword = await compare(password as string, user.password as string);
+        if(!comparePassword) {
+            return "Credentials not found.";
+        }
+
+        const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
 
         return res.status(200).json({token});
     } 
