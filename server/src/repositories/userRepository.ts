@@ -5,11 +5,26 @@ import { IUserTheme, ITheme } from '../types/user';
 
 export default class UserRepository implements IUserRepository {
 
+    public async createUser(user: IUser): Promise<Partial<IUser>> {
+        const newUser = await db('users').insert(user).returning('*');
+        return newUser[0];
+    }
+
     public async getUserByID(userID: string):Promise<Partial<IUser> | undefined > {
 
         const user = await db('users')
             .select('id', 'email')
             .where({id: userID})
+            .first();
+        
+        return user
+    }
+
+    public async getUserByEmail(userEmail: string):Promise<Partial<IUser> | undefined > {
+
+        const user = await db('users')
+            .select('id', 'password', 'email')
+            .where({email: userEmail})
             .first();
         
         return user
@@ -41,5 +56,4 @@ export default class UserRepository implements IUserRepository {
     public async getThemes(): Promise<Array<ITheme>> {
         return await db('themes');
     }
-
 }
