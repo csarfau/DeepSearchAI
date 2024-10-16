@@ -1,15 +1,37 @@
-import { ChatOpenAI, ChatOpenAICallOptions } from "@langchain/openai";
+import { AIMessageChunk } from "@langchain/core/messages";
+
+import { google } from "googleapis";
+import { config } from "dotenv";
+import llm from '../openIA/chatOpenIA';
+config();
+
+const customsearch = google.customsearch("v1");
+
+const googleApiKey = process.env.GOOGLE_API_KEY;
+const cseId = process.env.GOOGLE_CX_ID;
+
+export interface PageSuggestion {
+    title: string;
+    link: string;
+    summary: string;
+    imageUrl?: string;
+}
 
 export default class SuggestionGenerationService {
-    private llmInstance;
 
-    constructor(llmInstance: ChatOpenAI<ChatOpenAICallOptions>) {
-        this.llmInstance = llmInstance;
+    private formatResponse (aiMsg: AIMessageChunk) {
+        
+        const startIndex = aiMsg.content.toString().indexOf('{');
+        const endIndex = aiMsg.content.toString().lastIndexOf('}') + 1;
+
+        const formattedResponse = JSON.parse(aiMsg.content.toString().slice(startIndex, endIndex));
+        
+        return formattedResponse; 
     }
 
-    public async generate(suggestions: Array<string>) {
+    public async generatePrompt(suggestions: Array<string>, wordLimit?: number) {
 
-        const aiMsg = await this.llmInstance.invoke([
+        const aiMsg = await llm.invoke([
             {
                 role: "system",
                 content: `
@@ -24,7 +46,7 @@ export default class SuggestionGenerationService {
                     
                     Requirements:
                     1. Generate exactly 4 search suggestions, each focusing on a different theme from the provided list.
-                    2. Each suggestion should be between 3-6 words long and be formulated as a search query.
+                    ${ wordLimit && `2. Each suggestion should be between ${wordLimit} words long and be formulated as a search query.'`}
                     3. Avoid repetition. Make each suggestion unique and intriguing.
                     4. Use current trends, niche topics, or interesting angles for each theme.
             
@@ -67,12 +89,42 @@ export default class SuggestionGenerationService {
                 `,
                 },
         ]);
+        return this.formatResponse(aiMsg); 
+    }
 
-        const startIndex = aiMsg.content.toString().indexOf('{');
-        const endIndex = aiMsg.content.toString().lastIndexOf('}') + 1;
-
-        const formattedResponse = JSON.parse(aiMsg.content.toString().slice(startIndex, endIndex));
-        
-        return formattedResponse; 
+    
+    private async searchGoogle(query: string): Promise<PageSuggestion[]> {
+        try {
+            const response = await customsearch.cse.list({
+                cx: cseId,
+                q: query,
+                auth: googleApiKey,
+                num: 10,
+                fields: 'items(title,link,snippet,pagemap/cse_image/src)',
+            });
+            
+            return (response.data.items || []).map((item) => ({
+                title: item.title || '',
+                link: item.link || '',
+                summary: item.snippet || '',
+                imageUrl: item.pagemap?.cse_image?.[0]?.src,
+            }));
+        } catch (error) {
+            console.error(`Error in Google search for query "${query}":`, error);
+            return [];
+        }
+    }
+    
+    public async generatePagesSuggestions(suggestions: string[]): Promise<Array<Array<PageSuggestion>>> {
+        try {
+            const querySuggestions = await this.generatePrompt(suggestions);
+            const searchPromises = Object.entries(querySuggestions).map(
+                ([theme, query]) => this.searchGoogle(query as string)
+            );
+        return await Promise.all(searchPromises);
+        } catch (error) {
+            console.error('Error in generatePagesSuggestions:', error);
+            return [];
+        }
     }
 }
