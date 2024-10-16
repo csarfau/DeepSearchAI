@@ -9,7 +9,6 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE INDEX idx_users_email ON users(email);
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()

@@ -1,16 +1,13 @@
 import { Router } from 'express';
 import UserController from '../controllers/userController';
-import UserRepository from '../repositories/userRepository';
-import { db } from '../database/knex';
 
 const userRouter = Router();
-
-const userRepository = new UserRepository(db); 
-const userController = new UserController(userRepository);
+const userController = new UserController();
 
 userRouter.get('/user/:id', (req, res) => userController.test(req, res));
 userRouter.post('/user/:id/themes', (req, res) => userController.saveThemeSuggestions(req, res));
 userRouter.get('/user/:id/suggestions', (req, res) => userController.getUsersSuggestions(req, res));
 userRouter.get('/themes', (req, res) => userController.getThemes(req, res));
+userRouter.get('/user/:id/pages/suggestions', (req, res) => userController.getUsersPagesSuggetions(req, res));
 
 export default userRouter;
