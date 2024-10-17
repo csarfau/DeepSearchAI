@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(json());
+
 app.use('/api', Router);
-// app.use(errorMiddleware);
+app.use(errorMiddleware);
 
 app.listen(PORT);

@@ -5,7 +5,7 @@ interface IFetchResponse {
     error?: string
 }
 
-const baseUrl = 'http://localhost:3000/api';
+const baseUrl = 'http://localhost:5000/api';
 
 export interface ITheme {
     id: string,
@@ -40,6 +40,23 @@ export const saveUserThemes = async (userID: string, usersThemes:Array<string>):
                 usersThemes
             }),
         });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            return { error: errorResponse.error }
+        } 
+
+        const data = await response.json();
+        
+        return { ...data };
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
+
+export const getPromptSuggestions = async (userID: string) => {
+    try {
+        const response = await fetch(baseUrl + `/user/${userID}/suggestions`);
 
         if (!response.ok) {
             const errorResponse = await response.json();

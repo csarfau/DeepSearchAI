@@ -17,6 +17,9 @@ export const theme = createTheme({
       primary: '#303030', 
       secondary: '#575757',
     },
+    gradients: {
+      text: 'linear-gradient(147deg, rgba(151,0,209,1) 0%, rgba(157,0,200,1) 26%, rgba(222,0,105,1) 100%);'
+    }
   },
   borders: {
     primary: '1px solid #59198C', 
