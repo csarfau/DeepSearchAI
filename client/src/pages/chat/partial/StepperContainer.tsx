@@ -7,7 +7,6 @@ import StepContent from '@mui/material/StepContent';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Container } from '@mui/material';
 import { theme } from '../../../App';
 
 const steps = [
