@@ -13,6 +13,18 @@ declare module '@mui/material/styles' {
         };
   }
 
+  interface Palette {
+    gradients: {
+      text: string;
+    };
+  }
+
+  interface PaletteOptions {
+    gradients?: {
+      text: string;
+    };
+  }
+
   interface ThemeOptions {
     borders?: {
         primary?: string;
@@ -24,5 +36,5 @@ declare module '@mui/material/styles' {
         large?: string;
     };
   }
-  
+
 }
