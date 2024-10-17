@@ -1,15 +1,31 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { login, registerUser } from "../../api/fetch";
+import useToast from "../../hooks/useToast";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailNotification, setEmailNotification] = useState(true);
+  const [email, setEmail] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [registerErrors, setRegisterErrors] = useState({ registerEmail: '', registerPassword: '', confirmPassword: '' });
+  const [valid, setValid] = useState(true);
   const theme = useTheme();
+  const showToast = useToast();
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowRegisterPassword = () => setShowRegisterPassword((show) => !show);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -20,12 +36,116 @@ const LoginPage = () => {
     event.preventDefault();
   };
 
+  const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmailNotification(event.target.checked);
+  };
+
   const handleToggle = () => {
     setRegisterChoice(!registerChoice);
   };
 
-  const handleLogin = async () => {
+  const clear = () => {
+    setValid(false);
+    setPassword('');
+    setRegisterPassword('');
+    setEmail('');
+    setRegisterEmail('');
+    setErrors({ email: '', password: '' });
+    setRegisterErrors({ registerEmail: '', registerPassword: '', confirmPassword: '' });
+  }
 
+  useEffect(() => {
+    clear();
+  }, [registerChoice]);
+
+  const validateLogin = () => {
+    const newErrors = { email: '', password: '' };
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+      newErrors.email = 'E-mail is required!';
+      setValid(false);
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Provide a valid e-mail!';
+      setValid(false);
+    }
+
+    if (!password) {
+      newErrors.password = 'Password is required!';
+      setValid(false);
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      setValid(false);
+    }
+
+    setErrors(newErrors);
+    setValid(true)
+    return valid;
+  }
+
+  const validateRegister = () => {
+    const newErrors = { registerEmail: '', registerPassword: '', confirmPassword: '' };
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!registerEmail) {
+      newErrors.registerEmail = 'E-mail is required!';
+      setValid(false);
+    } else if (!emailRegex.test(registerEmail)) {
+      newErrors.registerEmail = 'Provide a valid e-mail!';
+      setValid(false);
+    }
+
+    if (!registerPassword) {
+      newErrors.registerPassword = 'Password is required!';
+      setValid(false);
+    } else if (registerPassword.length < 6) {
+      newErrors.registerPassword = 'Password must be at least 6 characters';
+      setValid(false);
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required';
+      setValid(false);
+    } else if (confirmPassword !== registerPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+      setValid(false);
+    }
+
+    setRegisterErrors(newErrors);
+    setValid(true)
+    return valid;
+  }
+
+  const handleLogin = async () => {    
+    if(!validateLogin()) return
+
+    try {
+      const response = await login(email, password);
+      
+      if (response.token) {
+        navigate('/chat');
+      }
+
+    } catch (error) {
+      showToast(error as string, 'error');
+    }
+  }
+
+  const handleRegister = async () => {
+    if(!validateRegister()) return
+
+    try {
+      const response = await registerUser(registerEmail, registerPassword);
+      console.log(response);
+      
+      if (response.data) {
+        showToast('Account created!', 'success');
+        setRegisterChoice(false);
+      }
+
+    } catch (error) {
+      showToast(error as string, 'error');
+    }
   }
 
   return (
@@ -93,33 +213,50 @@ const LoginPage = () => {
                   flexDirection: 'column',
                   gap: '2rem',
                 }}>
-                  <TextField label="Email" variant="outlined" />
+                  <FormControl variant="outlined">
+                    <TextField 
+                      label="Email" 
+                      variant="outlined"
+                      value={registerEmail} 
+                      onChange={(e) => setRegisterEmail(e.target.value)}
+                    />
+                    {registerErrors.registerEmail && <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>{registerErrors.registerEmail}</span>}
+                  </FormControl>
                   <FormControl variant="outlined">
                     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showRegisterPassword ? 'text' : 'password'}
+                      value={registerPassword}
+                      onChange={(e) => setRegisterPassword(e.target.value)}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
                             aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
+                            onClick={handleClickShowRegisterPassword}
                             onMouseDown={handleMouseDownPassword}
                             onMouseUp={handleMouseUpPassword}
                             edge="end"
                           >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                            {showRegisterPassword ? <VisibilityOff /> : <Visibility />}
                           </IconButton>
                         </InputAdornment>
                       }
                       label="Password"
                     />
+                    {registerErrors.registerPassword && 
+                      <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>
+                        {registerErrors.registerPassword}
+                      </span>
+                    }
                   </FormControl>
                   <FormControl variant="outlined">
                     <InputLabel htmlFor="outlined-adornment-password">Confirm Password</InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
                       type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -135,6 +272,11 @@ const LoginPage = () => {
                       }
                       label="Confirm Password"
                     />
+                    {registerErrors.confirmPassword && 
+                      <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>
+                        {registerErrors.confirmPassword}
+                      </span>
+                    }
                   </FormControl>
                 </Box>
                 <Box sx={{ 
@@ -145,7 +287,17 @@ const LoginPage = () => {
                   paddingLeft: 1
                 }}>
                   <Typography sx={{ cursor: 'pointer' }}>
-                    <FormControlLabel control={<Switch defaultChecked />} label="Allow notification" labelPlacement="start" sx={{ margin: 0 }} />
+                    <FormControlLabel 
+                      control={
+                        <Switch 
+                          onChange={handleSwitchChange}
+                          checked={emailNotification}
+                        />
+                      } 
+                      label="E-mail notification" 
+                      labelPlacement="start" 
+                      sx={{ margin: 0 }}
+                    />
                   </Typography>
                   <Typography sx={{ cursor: 'pointer' }}>
                   Privacy Police
@@ -167,7 +319,14 @@ const LoginPage = () => {
                 display: 'flex',
                 flexDirection: 'column',
               }}>
-                <Button variant="contained" size="large" sx={{ background: theme.palette.gradients.text }}>SIGN UP</Button>
+                <Button 
+                  onClick={handleRegister}
+                  variant="contained" 
+                  size="large" 
+                  sx={{ background: theme.palette.gradients.text }}
+                >
+                  SIGN UP
+                </Button>
                 <Typography sx={{alignSelf: 'center'}}>or</Typography>
                 <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>SIGN UP WITH GOOGLE</Button>
               </Box>
@@ -205,13 +364,21 @@ const LoginPage = () => {
                 }}>
                   
                   <FormControl variant="outlined">
-                    <TextField label="Email" variant="outlined" />
+                    <TextField 
+                      label="Email" 
+                      variant="outlined"
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    {errors.email && <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>{errors.email}</span>}
                   </FormControl>
                   <FormControl variant="outlined">
                     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={ showPassword ? 'text' : 'password' }
+                      value={ password }
+                      onChange={(e) => setPassword(e.target.value)}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -227,6 +394,7 @@ const LoginPage = () => {
                       }
                       label="Password"
                     />
+                    {errors.password && <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>{errors.password}</span>}
                   </FormControl>
                 </Box>
                 <Box sx={{ 
@@ -251,7 +419,13 @@ const LoginPage = () => {
                 display: 'flex',
                 flexDirection: 'column',
               }}>
-                <Button variant="contained" size="large" sx={{ background: theme.palette.gradients.text }} onClick={handleLogin}>LOG IN</Button>
+                <Button 
+                  variant="contained" 
+                  size="large" sx={{ background: theme.palette.gradients.text }} 
+                  onClick={handleLogin}
+                >
+                  LOG IN
+                </Button>
                 <Typography sx={{alignSelf: 'center'}}>or</Typography>
                 <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>CONTINUE WITH GOOGLE</Button>
               </Box>
