@@ -1,11 +1,8 @@
 import { Request, Response } from 'express';
-import SuggestionGenerationService, { PageSuggestion } from '../services/suggestionGenerationService';
+import SuggestionGenerationService from '../services/suggestionGenerationService';
 import UserRepository from '../repositories/userRepository';
-import { IUser, IUserRepository } from '../types/user';
-import llm from '../openIA/chatOpenIA'
+import { IUser } from '../types/user';
 import bcrypt, { compare } from 'bcrypt';
-import knex, { Knex } from 'knex';
-import { sign } from 'jsonwebtoken';
 import { createToken } from '../utils/token';
 
 const userRepository = new UserRepository(); 
