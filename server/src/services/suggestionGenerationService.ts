@@ -100,6 +100,7 @@ export default class SuggestionGenerationService {
                 q: query,
                 auth: googleApiKey,
                 num: 10,
+                safe: 'active',
                 fields: 'items(title,link,snippet,pagemap/cse_image/src)',
             });
             
