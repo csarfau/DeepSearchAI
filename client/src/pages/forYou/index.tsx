@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { iconsPath } from '../components/Icons';
-import { SuggestionThemes } from '../chat/partial';
 import { theme } from '../../App';
+import { SuggestionThemes } from '../chat/partial/SuggestionCard';
 
 const ForYouPage = () => {
     const [data, setData] = useState<Array<Suggestion>>();

@@ -26,8 +26,6 @@ export const SkeletonThemeCard: React.FC = () => {
     );
 };
 
-
-
 interface IOptionThemeCard {
     label: keyof typeof iconsPath;
     variant: 'outlined' | 'contained';

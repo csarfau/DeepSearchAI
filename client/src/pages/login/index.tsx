@@ -170,26 +170,186 @@ const LoginPage = () => {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <Box sx={{
-          position: 'absolute',
-          top: 0,
-          left: registerChoice ? '50%' : 0,
+        {/* Container Login */}
+        <Box sx={{ 
           width: '50%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'flex', 
+          flexDirection: 'column', 
           alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'left 0.8s ease-in-out',
+          gap: '2rem',
+          ...(registerChoice ? {
+              transition: 'transform 1s ease-in-out , opacity 0.5s ease-in-out',
+              transform: 'translateX(100%)',
+              opacity: 0,
+              zIndex: 0,
+            }
+            :
+            {
+              transition: 'transform 1s ease-in-out , opacity 1.6s ease-in',
+              transform: 'translateX(0)',
+              opacity: 1,
+              zIndex: 1
+            }
+            )
         }}>
-          {registerChoice ? (
+          <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: '28px', fontWeight: '400' }}>
+            Welcome to 
+            <Box component="span" className="text-gradient" sx={{ 
+              fontSize: '32px', 
+              fontWeight: '600', 
+              color: 'pink', 
+              paddingLeft: 1, 
+              paddingRight: 1,
+            }}>
+              DeepSearchAI
+            </Box>
+              <img style={{ transform: 'translateY(3px)'}} src="./src/assets/icons/logo.svg"/>
+          </Typography>
+          <Box sx={{
+            width: '90%',
+            display: 'flex',
+            flexDirection: 'column',
+            maxWidth: '30rem'
+          }}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2rem',
+            }}>
+              
+              <FormControl variant="outlined" sx={{ position: 'relative'}}>
+                <TextField 
+                  label="Email" 
+                  variant="outlined"
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {errors.email && 
+                  <span style={{
+                    color: theme.palette.error.main ,
+                    fontSize: '14px',
+                    position: 'absolute',
+                    left: 0,
+                    bottom: '-20px'
+                  }}>
+                    {errors.email}
+                  </span>
+                }
+              </FormControl>
+              <FormControl variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-password"
+                  type={ showPassword ? 'text' : 'password' }
+                  value={ password }
+                  onChange={(e) => setPassword(e.target.value)}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        onMouseUp={handleMouseUpPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="Password"
+                />
+                {errors.password && 
+                  <span style={{
+                    color: theme.palette.error.main ,
+                    fontSize: '14px',
+                    position: 'absolute',
+                    left: 0,
+                    bottom: '-20px'
+                  }}>
+                    {errors.password}
+                  </span>
+                }
+              </FormControl>
+            </Box>
             <Box sx={{ 
-              width: '70%',
+              display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              pt: '0.7rem' 
+            }}>
+              <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }}>
+                Forgot your password?
+              </Typography>
+              <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }} onClick={handleToggle}>
+                Create account
+              </Typography>
+            </Box>
+          </Box>
+          <Box>
+          </Box>
+          <Box sx={{
+            width: '90%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem',
+            maxWidth: '30rem'
+          }}>
+            <Button 
+              variant="contained" 
+              size="large" sx={{ background: theme.palette.gradients.text }} 
+              onClick={handleLogin}
+            >
+              LOG IN
+            </Button>
+            <Typography sx={{alignSelf: 'center'}}>or</Typography>
+            <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>CONTINUE WITH GOOGLE</Button>
+          </Box>
+        </Box>
+
+
+        {/* Container Image */}
+        <Box sx={{
+            zIndex: 30,
+            position: 'absolute',
+            top: 0,
+            left: registerChoice ? 0 : '50%',
+            width: '50%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'left 0.7s ease-in-out',
+            overflow: 'hidden',
+            backgroundImage: 'url(./src/assets/icons/banner.svg)',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center'
+        }}>
+        </Box>
+            
+        {/* Form register */}
+        <Box sx={{ 
+              width: '50%',
               display: 'flex', 
               flexDirection: 'column', 
               alignItems: 'center',
               gap: '2rem',
-            }}>
+              ...(!registerChoice ? {
+                  transform: 'translateX(-100%)',
+                  zIndex: 0,
+                  opacity: 0,
+                  transition: 'transform 1s ease-in-out , opacity 0.5s ease-in-out',
+                }
+                :
+                {
+                  transition: 'transform 0.8s ease-in-out , opacity 1.6s ease-in',
+                  transform: 'translateX(0)',
+                  zIndex: 1,
+                  opacity: 1
+                }
+              )
+            }}
+            >
               <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: '28px', fontWeight: '400' }}>
                 Welcome to 
                 <Box component="span" className="text-gradient" sx={{ 
@@ -205,6 +365,7 @@ const LoginPage = () => {
               </Typography>
               <Box sx={{
                 width: '90%',
+                maxWidth: '30rem',
                 display: 'flex',
                 flexDirection: 'column',
               }}>
@@ -219,10 +380,21 @@ const LoginPage = () => {
                       variant="outlined"
                       value={registerEmail} 
                       onChange={(e) => setRegisterEmail(e.target.value)}
-                    />
-                    {registerErrors.registerEmail && <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>{registerErrors.registerEmail}</span>}
+                      sx={{position: 'relative'}}
+                    />                   
+                    {registerErrors.registerEmail && 
+                          <span style={{
+                            color: theme.palette.error.main ,
+                            fontSize: '14px', 
+                            position: 'absolute',
+                            left: 0,
+                            bottom: '-20px' 
+                          }}>
+                            {registerErrors.registerEmail}
+                          </span>
+                      } 
                   </FormControl>
-                  <FormControl variant="outlined">
+                  <FormControl variant="outlined" sx={{ position: 'relative'}}>
                     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
@@ -244,13 +416,19 @@ const LoginPage = () => {
                       }
                       label="Password"
                     />
-                    {registerErrors.registerPassword && 
-                      <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>
-                        {registerErrors.registerPassword}
-                      </span>
-                    }
+                      {registerErrors.registerPassword && 
+                        <span style={{
+                          color: theme.palette.error.main ,
+                          fontSize: '14px',
+                          position: 'absolute',
+                          left: 0,
+                          bottom: '-20px'
+                        }}>
+                          {registerErrors.registerPassword}
+                        </span>
+                      }
                   </FormControl>
-                  <FormControl variant="outlined">
+                  <FormControl variant="outlined" sx={{position: 'relative'}}>
                     <InputLabel htmlFor="outlined-adornment-password">Confirm Password</InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
@@ -273,43 +451,60 @@ const LoginPage = () => {
                       label="Confirm Password"
                     />
                     {registerErrors.confirmPassword && 
-                      <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>
-                        {registerErrors.confirmPassword}
-                      </span>
-                    }
+                        <span style={{
+                          color: theme.palette.error.main ,
+                          fontSize: '14px',
+                          position: 'absolute',
+                          left: 0,
+                          bottom: '-20px'
+                        }}>
+                          {registerErrors.confirmPassword}
+                        </span>
+                      }
                   </FormControl>
                 </Box>
                 <Box sx={{ 
                   display: 'flex', 
                   justifyContent: 'space-between',
-                  alignItems: 'center', 
-                  paddingRight: 1, 
-                  paddingLeft: 1
+                  alignItems: 'center',
+                  maxWidth: '30rem',
+                  pt: '0.6rem'
                 }}>
-                  <Typography sx={{ cursor: 'pointer' }}>
+                  <Typography variant="subtitle2"  sx={{ cursor: 'pointer' }}>
                     <FormControlLabel 
                       control={
-                        <Switch 
+                        <Switch
+                          size={'medium'} 
                           onChange={handleSwitchChange}
                           checked={emailNotification}
                         />
                       } 
                       label="E-mail notification" 
                       labelPlacement="start" 
-                      sx={{ margin: 0 }}
+                      sx={{ 
+                        margin: 0,
+                    
+                      }}
+                      slotProps ={{
+                        typography: {
+                          sx: {
+                            fontSize: '14px', 
+                            color: '#303030', 
+                          },
+                      }}}
                     />
                   </Typography>
-                  <Typography sx={{ cursor: 'pointer' }}>
-                  Privacy Police
+                  <Typography variant="subtitle2" sx={{ cursor: 'pointer' }}>
+                    Privacy Police
                   </Typography>
                 </Box>
-                <Typography sx={{ paddingLeft: 1 }}>Already has account?
+                <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary }}>Already has account?
                   <Button 
                   onClick={handleToggle}
                   variant="text" 
                   size="small" 
                   className="text-gradient" 
-                  sx={{ fontWeight: 600, fontSize: '16px' }}>
+                  sx={{ fontWeight: 600, fontSize: '14px' }}>
                     LOG IN
                   </Button>
                 </Typography>
@@ -318,6 +513,8 @@ const LoginPage = () => {
                 width: '90%',
                 display: 'flex',
                 flexDirection: 'column',
+                gap: '0.5rem',
+                maxWidth: '30rem'
               }}>
                 <Button 
                   onClick={handleRegister}
@@ -331,126 +528,6 @@ const LoginPage = () => {
                 <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>SIGN UP WITH GOOGLE</Button>
               </Box>
             </Box>
-          ) : (
-            <Box sx={{ 
-              width: '70%',
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center',
-              gap: '2rem',
-            }}>
-              <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: '28px', fontWeight: '400' }}>
-                Welcome to 
-                <Box component="span" className="text-gradient" sx={{ 
-                  fontSize: '32px', 
-                  fontWeight: '600', 
-                  color: 'pink', 
-                  paddingLeft: 1, 
-                  paddingRight: 1,
-                }}>
-                  DeepSearchAI
-                </Box>
-                  <img style={{ transform: 'translateY(3px)'}} src="./src/assets/icons/logo.svg"/>
-              </Typography>
-              <Box sx={{
-                width: '90%',
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-                <Box sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2rem',
-                }}>
-                  
-                  <FormControl variant="outlined">
-                    <TextField 
-                      label="Email" 
-                      variant="outlined"
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    {errors.email && <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>{errors.email}</span>}
-                  </FormControl>
-                  <FormControl variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                    <OutlinedInput
-                      id="outlined-adornment-password"
-                      type={ showPassword ? 'text' : 'password' }
-                      value={ password }
-                      onChange={(e) => setPassword(e.target.value)}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            onMouseUp={handleMouseUpPassword}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      label="Password"
-                    />
-                    {errors.password && <span style={{color: 'red', fontSize: '14px', paddingBottom: '5px'}}>{errors.password}</span>}
-                  </FormControl>
-                </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between',
-                  alignItems: 'center', 
-                  paddingRight: 1, 
-                  paddingLeft: 1
-                }}>
-                  <Typography sx={{ cursor: 'pointer' }}>
-                    Forgot your password?
-                  </Typography>
-                  <Typography sx={{ cursor: 'pointer' }} onClick={handleToggle}>
-                  Create account
-                  </Typography>
-                </Box>
-              </Box>
-              <Box>
-              </Box>
-              <Box sx={{
-                width: '90%',
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-                <Button 
-                  variant="contained" 
-                  size="large" sx={{ background: theme.palette.gradients.text }} 
-                  onClick={handleLogin}
-                >
-                  LOG IN
-                </Button>
-                <Typography sx={{alignSelf: 'center'}}>or</Typography>
-                <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>CONTINUE WITH GOOGLE</Button>
-              </Box>
-            </Box>
-          )}
-        </Box>
-
-        <Box sx={{
-          zIndex: 10,
-          position: 'absolute',
-          top: 0,
-          left: registerChoice ? 0 : '50%',
-          width: '50%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'left 0.8s ease-in-out',
-          overflow: 'hidden',
-          backgroundImage: 'url(./src/assets/icons/banner.svg)',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }}>
-        </Box>
       </Paper>
     </Box>
   );

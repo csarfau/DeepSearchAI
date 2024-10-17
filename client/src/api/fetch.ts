@@ -6,7 +6,7 @@ interface IFetchResponse {
     error?: string
 }
 
-const baseUrl = 'http://localhost:3000/api';
+const baseUrl = 'http://localhost:5000/api';
 
 export interface ITheme {
     id: string,
@@ -16,7 +16,7 @@ export interface ITheme {
 export const fetchThemes = async ():Promise<IFetchResponse> => {
     try {
         const response = await fetch(baseUrl + '/themes');
-
+        
         if (!response.ok) {
             const errorResponse = await response.json();
             return { error: errorResponse.error }
