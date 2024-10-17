@@ -4,7 +4,8 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { fetchThemes, ITheme, saveUserThemes } from '../../api/fetch';
-import { iconsPath, OptionThemeCard, SkeletonThemeCard } from './partial';
+import {  OptionThemeCard, SkeletonThemeCard } from './partial';
+import { iconsPath } from '../components/Icons'
 import  useToast  from '../../hooks/useToast';
 
 const SuggestionPage = () => {
@@ -51,12 +52,12 @@ const SuggestionPage = () => {
             })
             }}>
             <Paper elevation={2} sx={{
-                minHeight: '90vh',
+                minHeight: '95vh',
                 boxSizing: 'border-box',
                 display: 'flex',
                 justifyContent: 'center',
                 flexDirection: 'column',
-                gap: '2rem',
+                gap: '1rem',
                 alignItems: 'center',
                 py: '2rem',
                 backgroundColor: theme.palette.secondary.main,
@@ -70,7 +71,7 @@ const SuggestionPage = () => {
                         Choose Your Preferences for Personalized AI Suggestions
                     </Typography>
                 </Box>
-                <Grid container spacing={4} justifyContent="center" sx={{ px: '1rem', boxSizing: 'border-box', maxWidth: '30rem' }}>
+                <Grid container spacing={2} justifyContent="center" sx={{ px: '1rem', boxSizing: 'border-box', maxWidth: '30rem'}}>
                     {loading ? (
                         Array.from({ length: 9 }).map((_, index) => (
                             <Grid key={index} size={{ xs: 6, sm: 4 }}>
