@@ -53,3 +53,29 @@ export const saveUserThemes = async (userID: string, usersThemes:Array<string>):
         return { error: error.message }
     }
 }
+
+export const login = async (email: string, password: string): Promise<IFetchResponse> => {
+    try {
+        const response = await fetch(`${baseUrl}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', 
+            },
+            body: JSON.stringify({ 
+                email,
+                password
+            }),
+        });
+        
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            return { error: errorResponse.error }
+        } 
+
+        const data = await response.json();
+        
+        return { ...data };
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
