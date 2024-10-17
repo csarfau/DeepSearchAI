@@ -12,7 +12,7 @@ export class GoogleCustomSearchRetriever {
     this.params = {
       cx: process.env.GOOGLE_CX_ID,
       auth: process.env.GOOGLE_API_KEY,
-      num: 10,
+      num: 5,
     };
   }
 
