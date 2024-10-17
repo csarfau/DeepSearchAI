@@ -36,5 +36,5 @@ declare module '@mui/material/styles' {
         large?: string;
     };
   }
-  
+
 }

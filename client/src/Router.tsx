@@ -1,9 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
+import LoginPage from "./pages/login";
 import SuggestionPage from "./pages/suggestion/index";
 import ChatPage from "./pages/chat/index";
 import ForYouPage from "./pages/forYou";
 
 const Router = createBrowserRouter([
+    {
+        path: "/login",
+        element: <LoginPage/>
+    },
     {
         path: "/user/suggestions",
         element: <SuggestionPage />,

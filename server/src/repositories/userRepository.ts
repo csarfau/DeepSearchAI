@@ -6,7 +6,9 @@ import { IUserTheme, ITheme } from '../types/user';
 export default class UserRepository implements IUserRepository {
 
     public async createUser(user: IUser): Promise<Partial<IUser>> {
-        const newUser = await db('users').insert(user).returning('*');
+        const newUser = await db('users')
+            .insert({ email: user.email, password: user.password })
+            .returning('*');
         return newUser[0];
     }
 
