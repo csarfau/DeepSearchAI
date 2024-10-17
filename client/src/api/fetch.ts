@@ -6,7 +6,7 @@ interface IFetchResponse {
     error?: string
 }
 
-const baseUrl = 'http://localhost:3000/api';
+const baseUrl = 'http://localhost:5000/api';
 
 export interface ITheme {
     id: string,
