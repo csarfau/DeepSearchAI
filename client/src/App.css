@@ -40,7 +40,7 @@ textarea::placeholder {
   --color-interactive: 255, 100, 255;
   --circle-size: 80%;
   --blending: hard-light;
-  --bg-gradient: linear-gradient(147deg, rgba(151,0,209,1) 0%, rgba(157,0,200,1) 50%, rgba(222,0,105,1) 100%);
+  --bg-gradient: 'linear-gradient(147deg, rgba(151,0,209,1) 0%, rgba(157,0,200,1) 50%, rgba(222,0,105,1) 100%)';
 }
 
 .span-primary {
