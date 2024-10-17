@@ -6,11 +6,11 @@ import ForYouPage from "./pages/forYou";
 
 const Router = createBrowserRouter([
     {
-        path: "/login",
+        path: "/",
         element: <LoginPage/>
     },
     {
-        path: "/user/suggestions",
+        path: "/suggestions",
         element: <SuggestionPage />,
     },
     {

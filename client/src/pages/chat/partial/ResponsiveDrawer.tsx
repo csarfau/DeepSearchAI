@@ -11,9 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import ListSubheader from '@mui/material/ListSubheader';
 import { useTheme } from '@mui/material/styles';
 import { Home, Person, Receipt } from '@mui/icons-material';
-import { Avatar, Grid2 as Grid, Typography} from '@mui/material';
-import { theme } from '../../App';
-import { iconsPath } from '../components/Icons';
+import { Avatar } from '@mui/material';
 
 export default function ResponsiveDrawer() {
     const [open, setOpen] = React.useState(false);
@@ -130,55 +128,3 @@ export default function ResponsiveDrawer() {
         </Box>
     );
 }
-
-export type SuggestionThemes = 
-        'trip' |
-        'cooking' |
-        'art' |
-        'technology' |
-        'programming' |
-        'politics' |
-        'sport' |
-        'history' |
-        'music';
-
-export type IUserSuggestion = {
-    [key in SuggestionThemes]?: string;
-};
-
-export const SuggestionCard: React.FC<IUserSuggestion> = (suggestionTheme) => {
-    const iconTypes = Object.keys(suggestionTheme) as SuggestionThemes[];
-
-    return (
-        <Grid container spacing={2} sx={{justifyContent: 'center'}}>
-            {iconTypes.map((iconType) => (
-                
-                <Grid size={{ xs: 12, sm: 6 }} key={iconType} sx={{
-                    maxWidth:{lg: '28rem'},
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    p: '0.5rem',
-                    bgcolor: '#FFFFFF',
-                    borderRadius: '10rem',
-                    boxShadow: '0px 1px 1px #818181',
-                    color: theme.palette.primary.main
-                }}>
-                    <Box
-                        sx={{
-                            width: '1.2rem', 
-                            height: '1.2rem', 
-                            background: 'linear-gradient(147deg, rgba(151,0,209,1) 0%, rgba(157,0,200,1) 26%, rgba(222,0,105,1) 100%)',
-                            WebkitMaskImage: `url(${iconsPath[iconType]})`,
-                            WebkitMaskSize: 'cover',
-                            maskImage: `url(${iconsPath[iconType]})`,
-                            maskSize: 'cover',
-                        }}
-                    />
-                    <Typography variant="body1">{suggestionTheme[iconType]}</Typography>
-                </Grid>
-            ))}
-        </Grid>
-    );
-};
