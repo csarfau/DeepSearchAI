@@ -1,4 +1,4 @@
-import { toast, ToastOptions, Flip, ToastContentProps  } from "react-toastify";
+import { toast, ToastOptions, Flip } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 type ToastType = "info" | "success" | "error" | "warn";
