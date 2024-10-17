@@ -15,7 +15,7 @@ export interface ITheme {
 export const fetchThemes = async ():Promise<IFetchResponse> => {
     try {
         const response = await fetch(baseUrl + '/themes');
-
+        
         if (!response.ok) {
             const errorResponse = await response.json();
             return { error: errorResponse.error }
