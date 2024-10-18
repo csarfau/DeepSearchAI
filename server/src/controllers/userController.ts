@@ -25,17 +25,19 @@ export default class UserController {
 
     public async login(req: Request, res: Response) {
         const { email, password } = req.body;
+        
         const user = await userRepository.getUserByEmail(email);
         if(!user) {
             return "Credentials not found."
         }
-
+        
         const comparePassword = await compare(password as string, user.password as string);
         if(!comparePassword) {
             return "Credentials not found.";
         }
-
+        
         const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
+        console.log(comparePassword);
 
         return res.status(200).json({token});
     } 
@@ -55,8 +57,6 @@ export default class UserController {
     }
 
     public async getThemes(req: Request, res: Response) {
-        console.log(req);
-        
         const themes = await userRepository.getThemes();
         return res.status(200).json({
             data: themes

@@ -92,7 +92,7 @@ const SuggestionPage = () => {
                     )}
                     <Typography variant='subtitle2' sx={{ alignSelf:'start'}}><span className='span-primary'>Obs:</span> You must select at least four interest themes.</Typography>
                 </Grid>
-                <Button onClick={() => saveDefinition()} sx={{ width: { xs: '70%', sm: '15rem' }}} size='medium' variant='outlined'>Confirm</Button>
+                <Button onClick={() => saveDefinition()} sx={{ width: { xs: '70%', sm: '15rem' }}} size='medium' variant='contained'>Confirm</Button>
             </Paper>
         </Container>
     )

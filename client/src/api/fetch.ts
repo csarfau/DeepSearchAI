@@ -68,12 +68,14 @@ export const login = async (email: string, password: string): Promise<IFetchResp
             }),
         });
         
+        console.log('response');
         if (!response.ok) {
             const errorResponse = await response.json();
             return { error: errorResponse.error }
         } 
 
         const data = await response.json();
+        console.log(data);
         
         return { ...data };
     } catch (error: any) {

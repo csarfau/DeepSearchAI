@@ -113,7 +113,7 @@ const ChatPage = () => {
                     :
                         <Box sx={{
                             width: '100%', 
-                            height: '100%',  // Ensure StepperContainer's Box takes full height
+                            height: '100%', 
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'stretch'
