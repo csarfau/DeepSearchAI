@@ -1,4 +1,3 @@
-import { SearchResults } from "duck-duck-scrape";
 import { ISearchResult } from "../types/searchEngine";
 import { DuckDuckGoSearch } from "@langchain/community/tools/duckduckgo_search";
 
@@ -10,12 +9,11 @@ export class DuckDuckGoSearchRetriever {
   }
 
   async retrieve(query: string): Promise<ISearchResult[]> {
-    const response: SearchResults = JSON.parse(await this.retriever.invoke(query));
+    const response = JSON.parse(await this.retriever.invoke(query));
 
-
-    return response.results.map((item) => ({
-      url: item.url,
-      snippet: item.rawDescription,
+    return response.map((item: any) => ({
+      url: item.link,
+      snippet: item.snippet,
       title: item.title,
       source: "DuckDuckGoSearch",
     }));

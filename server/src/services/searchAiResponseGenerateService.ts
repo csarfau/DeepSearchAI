@@ -5,19 +5,9 @@ import SearchEnginesRetriever from "./searchEnginesRetriever";
 import TavilyContentExtractor from "./tavilyExtractContentService";
 
 export default class SearchAiResponseGenerateService {
-  private llmInstance;
-  private urlListSchema = z.object({
-    urls: z
-      .array(z.string().url())
-      .min(1)
-      .max(10)
-      .describe("A list of the 10 most promising URLs"),
-  });
-  private markdownSchema = z.object({
-    response: z.string().describe("Content in Markdown format"),
-  });
-
   private readonly searchEnginesRetriever: SearchEnginesRetriever;
+  private llmInstance: ChatOpenAI;
+  private llmInstanceStream: ChatOpenAI;
 
   constructor() {
     this.searchEnginesRetriever = new SearchEnginesRetriever();
@@ -28,52 +18,78 @@ export default class SearchAiResponseGenerateService {
       maxTokens: undefined,
       timeout: undefined,
       maxRetries: 2,
-      streaming: true
+    });
+    this.llmInstanceStream = new ChatOpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      model: "gpt-4o-mini",
+      temperature: 0,
+      maxTokens: undefined,
+      timeout: undefined,
+      maxRetries: 2,
+      streaming: true,
     });
   }
 
-
-  public async generateAiResponse<T>(query: string): Promise<T> {
+  public async* generateAiResponse(
+    query: string,
+  ) {
     try {
       const allSearchList =
         await this.searchEnginesRetriever.searchAllEnginesResulst(query);
 
+      yield {type: 'firstStep'}
+
       const filterPrompt = this.formatAiFilterPrompt(query, allSearchList);
       const filteredList: { urls: Array<string> } = await this.callAiAssistant(
-        filterPrompt,
-        this.urlListSchema
+        filterPrompt
       );
-
+      yield {type: 'secondStep'}
+      
       const extractor = new TavilyContentExtractor(filteredList);
       const data = await extractor.extractAll();
-
+      yield {type: 'thirdStep'}
+    
       const finalPrompt = this.formatAiUserRequestPrompt(query, data.results);
-      // return finalPrompt as T
+      
+      const markdownSchema = z.object({
+        response: z.string().describe("Content in Markdown format"),
+      });
+      
+      const llmInstanceWithSchema =
+        this.llmInstanceStream.withStructuredOutput(markdownSchema);      
+    
+    const stream = await llmInstanceWithSchema.stream(finalPrompt);
 
-      const finalReport: { response: string } = await this.callAiAssistant(
-        finalPrompt,
-        this.markdownSchema
-      );
+      for await ( const chunk of stream){
+        if(typeof chunk.response !== "string"){
+           continue;
+        }
+        yield { type: 'content', content: chunk.response }
+      }
 
-      console.log(finalReport.response);
-
-      return finalReport.response as T;
+      yield { type: 'done'}
     } catch (error) {
-      console.log("Error:: ", error);
-      return `${error}` as T;
+      throw error;
     }
   }
 
   /**
    * Generate AI response with a dinamic validation scheme
    * @param prompt - Prompt to be send to the AI
-   * @param schema - Validation scheme (`markdownSchema` or `urlArraySchema`)
    */
   private async callAiAssistant<T>(
-    prompt: Array<{ role: "user" | "assistant" | "system"; content: string }>,
-    schema: z.ZodType
+    prompt: Array<{ role: "user" | "assistant" | "system"; content: string }>
   ): Promise<T> {
-    const llmInstanceWithSchema = this.llmInstance.withStructuredOutput(schema);
+    const urlListSchema = z.object({
+      urls: z
+        .array(z.string().url())
+        .min(1)
+        .max(5)
+        .describe("A list of the 5 most promising URLs"),
+    });
+
+    const llmInstanceWithSchema =
+      this.llmInstance.withStructuredOutput(urlListSchema);
 
     const aiMsg = await llmInstanceWithSchema.invoke(prompt);
 
@@ -101,7 +117,7 @@ export default class SearchAiResponseGenerateService {
             )
             .join("\n\n")}
     
-          Please evaluate the relevance and quality of these results, and select the 10 most useful URLs that best match the query intent. Your output should be a list of URLs in descending order of relevance, focusing on:
+          Please evaluate the relevance and quality of these results, and select the 5 most useful URLs that best match the query intent. Your output should be a list of URLs in descending order of relevance, focusing on:
           1. Authoritative sources
           2. Clear and relevant information
           3. Unique insights or perspectives on the topic.
@@ -141,7 +157,6 @@ export default class SearchAiResponseGenerateService {
       }\n\n`;
     });
 
-    // Return the formatted message to be sent to the AI
     return [
       {
         role: "system",
@@ -154,5 +169,4 @@ export default class SearchAiResponseGenerateService {
       },
     ];
   }
-
 }
