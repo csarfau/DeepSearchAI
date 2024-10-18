@@ -63,17 +63,26 @@ const LoginPage = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email) {
+      console.log(`email : ${!email}`);
+      
       newErrors.email = 'E-mail is required!';
       setValid(false);
     } else if (!emailRegex.test(email)) {
+      console.log(`email regex : ${!emailRegex}`);
+
       newErrors.email = 'Provide a valid e-mail!';
       setValid(false);
     }
 
     if (!password) {
+      console.log(`password : ${!emailRegex}`);
+
       newErrors.password = 'Password is required!';
       setValid(false);
     } else if (password.length < 6) {
+
+      console.log(`password lenght: ${!emailRegex}`);
+
       newErrors.password = 'Password must be at least 6 characters';
       setValid(false);
     }
@@ -116,11 +125,17 @@ const LoginPage = () => {
     return valid;
   }
 
-  const handleLogin = async () => {    
-    if(!validateLogin()) return
+  const handleLogin = async () => {  
 
+    console.log(!validateLogin());
+    
+    if(!validateLogin()) return
+    
+    
     try {
       const response = await login(email, password);
+     
+      console.log(response);
       
       if (response.token) {
         navigate('/chat');
@@ -237,9 +252,8 @@ const LoginPage = () => {
                 }
               </FormControl>
               <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <InputLabel>Password</InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
                   type={ showPassword ? 'text' : 'password' }
                   value={ password }
                   onChange={(e) => setPassword(e.target.value)}
@@ -292,7 +306,7 @@ const LoginPage = () => {
             display: 'flex',
             flexDirection: 'column',
             gap: '0.5rem',
-            maxWidth: '30rem'
+            maxWidth: '22rem'
           }}>
             <Button 
               variant="contained" 
@@ -395,9 +409,8 @@ const LoginPage = () => {
                       } 
                   </FormControl>
                   <FormControl variant="outlined" sx={{ position: 'relative'}}>
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                    <InputLabel>Password</InputLabel>
                     <OutlinedInput
-                      id="outlined-adornment-password"
                       type={showRegisterPassword ? 'text' : 'password'}
                       value={registerPassword}
                       onChange={(e) => setRegisterPassword(e.target.value)}
@@ -429,9 +442,8 @@ const LoginPage = () => {
                       }
                   </FormControl>
                   <FormControl variant="outlined" sx={{position: 'relative'}}>
-                    <InputLabel htmlFor="outlined-adornment-password">Confirm Password</InputLabel>
+                    <InputLabel>Confirm Password</InputLabel>
                     <OutlinedInput
-                      id="outlined-adornment-password"
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -514,7 +526,7 @@ const LoginPage = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.5rem',
-                maxWidth: '30rem'
+                maxWidth: '22rem'
               }}>
                 <Button 
                   onClick={handleRegister}
