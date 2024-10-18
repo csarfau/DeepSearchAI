@@ -1,17 +1,32 @@
 import { IUser, IUserRepository } from '../types/user';
 import { CustomError } from '../helpers/customError';
-import { Knex } from 'knex';
+import { db }  from '../database/knex';
 import { IUserTheme, ITheme } from '../types/user';
 
 export default class UserRepository implements IUserRepository {
 
-    constructor(private readonly dbConnection: Knex) {}
+    public async createUser(user: IUser): Promise<Partial<IUser>> {
+        const newUser = await db('users')
+            .insert({ email: user.email, password: user.password })
+            .returning('*');
+        return newUser[0];
+    }
 
     public async getUserByID(userID: string):Promise<Partial<IUser> | undefined > {
 
-        const user = await this.dbConnection('users')
+        const user = await db('users')
             .select('id', 'email')
             .where({id: userID})
+            .first();
+        
+        return user
+    }
+
+    public async getUserByEmail(userEmail: string):Promise<Partial<IUser> | undefined > {
+
+        const user = await db('users')
+            .select('id', 'password', 'email')
+            .where({email: userEmail})
             .first();
         
         return user
@@ -24,16 +39,16 @@ export default class UserRepository implements IUserRepository {
             theme_id: themeID
         }));
 
-        return await this.dbConnection('users_theme').insert(usersThemeData).returning('*');
+        return await db('users_theme').insert(usersThemeData).returning('*');
     }
 
     public async getUsersThemes(userID: string): Promise<Array<string>> {
 
-        const usersThemesIDs = await this.dbConnection('users_theme')
+        const usersThemesIDs = await db('users_theme')
             .pluck('theme_id')
             .where('user_id', userID);
         
-        const themesNames = await this.dbConnection('themes')
+        const themesNames = await db('themes')
             .pluck('name')
             .whereIn('id', usersThemesIDs);
 
@@ -41,7 +56,6 @@ export default class UserRepository implements IUserRepository {
     }
 
     public async getThemes(): Promise<Array<ITheme>> {
-        return await this.dbConnection('themes');
+        return await db('themes');
     }
-
 }
