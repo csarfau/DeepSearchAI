@@ -2,9 +2,10 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from "react";
-import { login, registerUser } from "../../api/fetch";
 import useToast from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
+import { createApiClient } from "../../api/fetch";
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
@@ -23,6 +24,7 @@ const LoginPage = () => {
   const theme = useTheme();
   const showToast = useToast();
   const navigate = useNavigate();
+  const { setToken } = useUser();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowRegisterPassword = () => setShowRegisterPassword((show) => !show);
@@ -63,26 +65,17 @@ const LoginPage = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email) {
-      console.log(`email : ${!email}`);
-      
       newErrors.email = 'E-mail is required!';
       setValid(false);
     } else if (!emailRegex.test(email)) {
-      console.log(`email regex : ${!emailRegex}`);
-
       newErrors.email = 'Provide a valid e-mail!';
       setValid(false);
     }
 
     if (!password) {
-      console.log(`password : ${!emailRegex}`);
-
       newErrors.password = 'Password is required!';
       setValid(false);
     } else if (password.length < 6) {
-
-      console.log(`password lenght: ${!emailRegex}`);
-
       newErrors.password = 'Password must be at least 6 characters';
       setValid(false);
     }
@@ -125,43 +118,38 @@ const LoginPage = () => {
     return valid;
   }
 
-  const handleLogin = async () => {  
+  const nonAuthClient = createApiClient({ token: null, userId: null });
 
-    console.log(!validateLogin());
-    
-    if(!validateLogin()) return
-    
-    
+  const handleLogin = async () => {
+
+    if (!validateLogin()) return;
     try {
-      const response = await login(email, password);
-     
-      console.log(response);
-      
-      if (response.token) {
-        navigate('/chat');
-      }
+      const response = await nonAuthClient.login(email, password);
 
+      if (response.error) return showToast(response.error, 'error');
+      
+        setToken(response.token as string);
+        navigate('/chat');
     } catch (error) {
       showToast(error as string, 'error');
     }
-  }
+  };
 
   const handleRegister = async () => {
-    if(!validateRegister()) return
-
+    if (!validateRegister()) return;
     try {
-      const response = await registerUser(registerEmail, registerPassword);
+      const response = await nonAuthClient.registerUser(registerEmail, registerPassword);
       console.log(response);
       
-      if (response.data) {
+      if (response.error) return showToast(response.error, 'error');
+    
         showToast('Account created!', 'success');
         setRegisterChoice(false);
-      }
-
+      
     } catch (error) {
       showToast(error as string, 'error');
     }
-  }
+  };
 
   return (
     <Box sx={{
