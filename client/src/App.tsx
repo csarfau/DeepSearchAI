@@ -4,6 +4,7 @@ import './App.css';
 import Router from './Router';
 import { createTheme } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
+import { UserProvider } from './hooks/useUser';
 
 export const theme = createTheme({
   palette: {
@@ -57,9 +58,11 @@ function App() {
     <>
       <ThemeProvider theme={theme}>
         <ToastContainer />
-        <div className="App">
-          <RouterProvider router={Router} />
-        </div>
+        <UserProvider>
+          <div className="App">
+            <RouterProvider router={Router} />
+          </div>
+        </UserProvider>
       </ThemeProvider>
     </>
   );

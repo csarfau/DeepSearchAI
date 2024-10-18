@@ -4,25 +4,34 @@ import { theme } from "../../App"
 import ResponsiveDrawer from "./partial/ResponsiveDrawer"
 import StepperContainer from "./partial/StepperContainer"
 import { useEffect, useState } from "react"
-import { getPromptSuggestions } from "../../api/fetch"
+import { createApiClient } from "../../api/fetch"
 import useToast from "../../hooks/useToast"
 import { IUserSuggestion, SuggestionCard, SuggestionCardSkeleton } from "./partial/SuggestionCard"
+import { useUser } from "../../hooks/useUser"
 
 const ChatPage = () => {
     const [promptSuggestions, setPromptSuggestion ] = useState<IUserSuggestion>({});
     const [isAnsweringUsersQuery, setIsAnsweringUsersQuery] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [usersQuery ,setUsersQuery] = useState('');
+    const {token, user, isLoading: isUserLoading } = useUser();
 
     const showToast = useToast();
     useEffect(() => {
         const getPrompts = async () => {
-            const { data, error } = await getPromptSuggestions('45015b5e-0862-4942-a823-17aa20514b99');     
-            data ? setPromptSuggestion(data) : showToast(error as string, 'error');
-            setIsLoading(false);
+            if (!isUserLoading && user && token) {
+                
+                const apiClient = createApiClient({ token, userId: user.id });
+                const response = await apiClient.getPromptSuggestions();
+    
+                if(response.error) return showToast(response.error);
+                setPromptSuggestion(response.data);
+                setIsLoading(false);
+            }
         };
+
         getPrompts(); 
-    }, []);
+    }, [user, token, isUserLoading]);
 
     const handleUsersQuery = () => {
         if(!usersQuery) return
