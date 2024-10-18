@@ -12,13 +12,23 @@ export default class SearchController {
   public searchRetrieve = async (
     req: Request,
     res: Response,
-    next: NextFunction
   ) => {
-    const query = req.body.query;
+    try {
+      const query = req.body.query;
 
-    const result =
-      await this.searchAiResponseGenerageService.generateAiResponse(query);
+      const stream =
+        await this.searchAiResponseGenerageService.generateAiResponse(query);
 
-    return res.status(200).json({ data: result });
+      res.setHeader("Content-Type", "text/plain");
+      res.setHeader("Transfer-Encoding", "chunked");
+
+      for await (const chunk of stream) {
+        res.write(JSON.stringify(chunk));
+      }
+
+      return res.end();
+    } catch (error) {
+      throw error;
+    }
   };
 }

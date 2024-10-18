@@ -6,15 +6,16 @@ import { json } from 'body-parser';
 import router from './routes/routes';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
-dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+dotenv.config();
 app.use(cors());
 
 app.use(json());
-app.use('/api', router);
+app.use("/api", router);
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`);
 });
