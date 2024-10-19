@@ -1,5 +1,5 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from "react";
 import { login, registerUser, sendForgotPasswordEmail } from "../../api/fetch";
@@ -20,6 +20,7 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [registerErrors, setRegisterErrors] = useState({ registerEmail: '', registerPassword: '', confirmPassword: '' });
   const [modalOpen, setModalOpen] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [valid, setValid] = useState(true);
   const theme = useTheme();
@@ -53,19 +54,27 @@ const LoginPage = () => {
   const handleCloseModal = () => {
     setModalOpen(false);
     setForgotEmail('');
+    setLoading(false);
   };
 
   const handleForgotPassword = async () => {
+    setLoading(true);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!forgotEmail) return showToast('E-mail is required!', 'error');
-    if(!emailRegex.test(forgotEmail)) return showToast('Provide a valid e-mail!', 'error');
+    if(!forgotEmail) {
+      setLoading(false);
+      return showToast('E-mail is required!', 'error');
+    }
+    if(!emailRegex.test(forgotEmail)) {
+      setLoading(false);
+      return showToast('Provide a valid e-mail!', 'error');
+    }
 
     try {
       const response = await sendForgotPasswordEmail(forgotEmail);
       if(response.error) return showToast(response.error, 'error');
       
-      showToast('Recovery e-mail send!', 'success');
       handleCloseModal();
+      showToast('Recovery e-mail send!', 'success');
     } catch (error) {
       showToast(error as string, 'error');
     }
@@ -323,12 +332,18 @@ const LoginPage = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseModal} color="primary">
+              <Button onClick={handleCloseModal} color="primary" disabled={loading ? true : false}> 
                 Cancelar
               </Button>
-              <Button onClick={handleForgotPassword} color="primary">
-                Enviar
-              </Button>
+              {loading ? 
+                <Box>
+                  <CircularProgress /> 
+                </Box>
+                : 
+                <Button onClick={handleForgotPassword} color="primary">
+                  Enviar
+                </Button>
+                }
             </DialogActions>
           </Dialog>
           <Box>
