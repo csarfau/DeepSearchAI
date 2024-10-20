@@ -45,14 +45,13 @@ export default class UserController {
         if(!user) {
             return res.status(401).json({ message: "Credentials not found." });
         }
-        
+
         const comparePassword = await compare(password as string, user.password as string);
         if(!comparePassword) {
             return res.status(401).json({ message: "Credentials not found." });
         }
-        
+
         const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
-        console.log(comparePassword);
 
         return res.status(200).json({token});
     } 
