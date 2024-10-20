@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { useState } from "react";
 import useToast from "../../hooks/useToast";
 import { useNavigate, useParams } from "react-router-dom";
-import { resetPassword } from "../../api/fetch";
+import { createApiClient } from "../../api/fetch";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -19,6 +19,8 @@ const ResetPassword = () => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
   const { token } = useParams(); 
+  const nonAuthClient = createApiClient({ token: null, userId: null });
+
   const validateForm = () => {
     const newErrors = { password: '', confirmPassword: '' };
 
@@ -42,7 +44,7 @@ const ResetPassword = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await resetPassword(password, token as string);
+      const response = await nonAuthClient.resetPassword(password, token as string);
       if(response.error) return showToast(response.error, 'error');
 
       showToast('Password successfully reset!', 'success');

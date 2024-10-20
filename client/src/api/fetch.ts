@@ -115,5 +115,57 @@ export const createApiClient = (authOptions: AuthOptions) => {
         getPromptSuggestions: async (): Promise<IFetchResponse> => {
             return authenticatedFetch(baseUrl + `/user/${authOptions.userId}/suggestions`);
         },
+
+        sendForgotPasswordEmail: async (email: string): Promise<IFetchResponse> => {
+            try {
+                const response = await fetch(`${baseUrl}/user/recovery-pass`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', 
+                    },
+                    body: JSON.stringify({ 
+                        email,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    return { error: errorResponse.error }
+                } 
+
+                const data = await response.json();
+
+                return { ...data };
+            } catch (error: any) {
+                return { error: error.message }
+            }
+        },
+
+        resetPassword: async (password: string, token: string): Promise<IFetchResponse> => {
+            try {
+                const response = await fetch(`${baseUrl}/user/reset-pass`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json', 
+                    },
+                    body: JSON.stringify({ 
+                        password
+                    }),
+                });
+        
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    return { error: errorResponse.error }
+                } 
+        
+                const data = await response.json();
+        
+                return { ...data };
+            } catch (error: any) {
+                return { error: error.message }
+            }
+        }
+
     };
 };

@@ -72,9 +72,9 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await sendForgotPasswordEmail(forgotEmail);
+      const response = await nonAuthClient.sendForgotPasswordEmail(forgotEmail);
       if(response.error) return showToast(response.error, 'error');
-      
+
       handleCloseModal();
       showToast('Recovery e-mail send!', 'success');
     } catch (error) {
@@ -163,7 +163,7 @@ const LoginPage = () => {
       const response = await nonAuthClient.login(email, password);
 
       if (response.error) return showToast(response.error, 'error');
-      
+
         setToken(response.token as string);
         navigate('/chat');
     } catch (error) {
@@ -175,8 +175,7 @@ const LoginPage = () => {
     if (!validateRegister()) return;
     try {
       const response = await nonAuthClient.registerUser(registerEmail, registerPassword);
-      console.log(response);
-      
+
       if (response.error) return showToast(response.error, 'error');
     
         showToast('Account created!', 'success');
