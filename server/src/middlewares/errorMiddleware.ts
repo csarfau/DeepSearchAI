@@ -15,5 +15,6 @@ export const errorMiddleware = (
         });
     }
 
-    return res.status(500).json({data: null, error: 'Erro interno no servidor.'});
+    if(process.env.DEVMODE === 'true') console.log("DevMOde Error Loggin::\n", err);
+    return res.status(500).json({data: null, error: 'Internal server error'});
 }
