@@ -3,7 +3,6 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -24,17 +23,11 @@ CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
-
+ 
 CREATE TABLE themes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    theme_id UUID REFERENCES themes(id)
-);
- 
-CREATE INDEX idx_users_theme_user_id ON users_theme(user_id);
-CREATE INDEX idx_users_theme_theme_id ON users_theme(theme_id);
-    "name" VARCHAR(50) NOT NULL,
-) 
+    "name" VARCHAR(50) NOT NULL
+); 
 
 INSERT INTO themes (name)
 VALUES 
@@ -57,11 +50,12 @@ CREATE TABLE users_theme (
 CREATE INDEX idx_users_theme_user_id ON users_theme(user_id);
 CREATE INDEX idx_users_theme_theme_id ON users_theme(theme_id);
 
+CREATE TABLE user_searchs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
+    query TEXT NOT NULL,
+    result TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 
-
-
-
-
-
-
-
+CREATE INDEX idx_user_searchs_user_id ON user_searchs(user_id);
