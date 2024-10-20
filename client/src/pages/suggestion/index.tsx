@@ -3,10 +3,11 @@ import { Button, Container, Paper, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { fetchThemes, ITheme, saveUserThemes } from '../../api/fetch';
+import { createApiClient, ITheme } from '../../api/fetch';
 import {  OptionThemeCard, SkeletonThemeCard } from './partial';
 import { iconsPath } from '../components/Icons'
 import  useToast  from '../../hooks/useToast';
+import { useUser } from '../../hooks/useUser';
 
 const SuggestionPage = () => {
     const theme = useTheme();
@@ -15,33 +16,40 @@ const SuggestionPage = () => {
     const [themeDefinition, setThemeDefinition] = useState<Array<string>>([]); 
     const [isFinishedDefinition, setIsFinishedDefinition] = useState(false);
     const showToast = useToast();
+    const { user, token, isLoading: isUserLoading} = useUser();
 
     const handleThemeChoice = (newThemeID:string) => {
         setThemeDefinition(prev => prev.includes(newThemeID) ? prev.filter(themeID => themeID !== newThemeID) :  [...prev, newThemeID]);
     }
 
-    const saveDefinition = async () => {
-        if (themeDefinition.length < 4) return; 
+    const handleSaveThemes = async (selectedThemes: string[]) => {
+        if (user && token) {
+            const apiClient = createApiClient({ token, userId: user.id });
+            const response = await apiClient.saveUserThemes(selectedThemes);
 
-        const response = await saveUserThemes('45015b5e-0862-4942-a823-17aa20514b99', themeDefinition);
-
-        if (response.error) {
-            return showToast(response.error, 'error');
+            if(response.error) return showToast(response.error);
+            setIsFinishedDefinition(true);
         }
-        
-        setIsFinishedDefinition(true);
-    }
+    };
 
     useEffect(() => {
 
-        const getThemes = async () => {
-            const { data, error } = await fetchThemes();     
-            setLoading(false);
-            data ? setThemesSuggestions(data) : showToast(error as string, 'error');
+        const loadThemes = async () => {
+            if (!isUserLoading && user && token) {
+                const apiClient = createApiClient({ token, userId: user.id });
+                const response = await apiClient.fetchThemes();
+                
+                if (response.error) return showToast(response.error);
+                
+                setLoading(false);
+                setThemesSuggestions(response.data);
+            }
+
+            return 
         };
 
-        getThemes(); 
-    }, []);
+        loadThemes();
+    }, [user, token, isUserLoading]);
         
     return (
         <Container sx={{
@@ -92,7 +100,7 @@ const SuggestionPage = () => {
                     )}
                     <Typography variant='subtitle2' sx={{ alignSelf:'start'}}><span className='span-primary'>Obs:</span> You must select at least four interest themes.</Typography>
                 </Grid>
-                <Button onClick={() => saveDefinition()} sx={{ width: { xs: '70%', sm: '15rem' }}} size='medium' variant='outlined'>Confirm</Button>
+                <Button onClick={() => handleSaveThemes(themeDefinition)} sx={{ width: { xs: '70%', sm: '15rem' }}} size='medium' variant='contained'>Confirm</Button>
             </Paper>
         </Container>
     )
