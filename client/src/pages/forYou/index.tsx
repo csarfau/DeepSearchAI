@@ -14,7 +14,6 @@ import { SuggestionThemes } from '../chat/partial/SuggestionCard';
 const ForYouPage = () => {
     const [data, setData] = useState<Array<Suggestion>>();
 
-    
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -22,8 +21,7 @@ const ForYouPage = () => {
 
                 if (res.ok) {
                     const { data } = await res.json();
-                    console.log(data);
-                    
+
                     setData(data)
                 }
 

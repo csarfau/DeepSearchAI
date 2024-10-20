@@ -15,4 +15,5 @@ userRouter.get('/user/:id/suggestions', (req, res) => userController.getUsersSug
 userRouter.get('/themes', (req, res) => userController.getThemes(req, res));
 userRouter.get('/user/:id/pages/suggestions', (req, res) => userController.getUsersPagesSuggetions(req, res));
 
+
 export default userRouter;

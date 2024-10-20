@@ -35,7 +35,6 @@ interface IOptionThemeCard {
 
 export const OptionThemeCard:React.FC<IOptionThemeCard> = ({
     label,
-    variant,
     onClick,
     isSelected = false
 }) => {
@@ -44,6 +43,7 @@ export const OptionThemeCard:React.FC<IOptionThemeCard> = ({
     const baseStyles:SxProps<Theme> = {
         border: theme.borders.primary, 
         borderRadius: theme.borderRadius.medium, 
+        boxSizing: 'border-box',
         px: 1,
         py: 4, 
         display: 'flex', 
@@ -58,52 +58,24 @@ export const OptionThemeCard:React.FC<IOptionThemeCard> = ({
         overflow: 'hidden',
         transition: 'transform 0.3s',
         ":hover": {
-            '&::after': {
-                content: '""', 
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(124, 124, 124, 0.425)',
-            }
+            boxShadow: `0 0 0 1px ${theme.palette.primary.main}`,
         },
-        ...(isSelected ? {
-            transform: 'scale(1.05)',
-            '&::after': {
-                content: '""', 
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(124, 124, 124, 0.425)',
+        ...(isSelected && {
+                transform: 'scale(1.05)',
+                background: theme.palette.primary.main,
+                color: isSelected ? theme.palette.secondary.main : theme.palette.primary.main
             }
-        } : {}) 
+        ) 
     }; 
 
-    const variantStyles = 
-        variant === 'outlined' ? 
-        {
-            background: theme.palette.secondary.main,
-            color: theme.palette.primary.main,
-        }
-        : 
-        {
-            background: theme.palette.primary.main,
-            color: theme.palette.secondary.main,
-        };
-
-
     return (
-        <Box  sx={{ ...baseStyles, ...variantStyles }} onClick={onClick}>
+        <Box  sx={{ ...baseStyles }} onClick={ onClick }>
             <img style={{
                 width: '1.5rem',
-                filter: variant === 'outlined' ? 
-                    'brightness(0) saturate(100%) invert(13%) sepia(75%) saturate(5186%) hue-rotate(271deg) brightness(89%) contrast(105%)' 
-                    : 
+                filter: isSelected ? 
                     'invert(0%)'
-                
+                    : 
+                    'brightness(0) saturate(100%) invert(13%) sepia(75%) saturate(5186%) hue-rotate(271deg) brightness(89%) contrast(105%)' 
                 }} src={iconsPath[label]} alt={`icon ${label}`} />
             <Typography variant='body2'>{label}</Typography>
         </Box>
