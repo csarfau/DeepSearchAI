@@ -30,11 +30,10 @@ CREATE TABLE themes (
     user_id UUID REFERENCES users(id),
     theme_id UUID REFERENCES themes(id)
 );
- 
+
 CREATE INDEX idx_users_theme_user_id ON users_theme(user_id);
-CREATE INDEX idx_users_theme_theme_id ON users_theme(theme_id);
-    "name" VARCHAR(50) NOT NULL,
-) 
+CREATE INDEX idx_users_theme_theme_id ON users_theme(theme_id)
+
 
 INSERT INTO themes (name)
 VALUES 
