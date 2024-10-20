@@ -1,5 +1,5 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
+import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from "react";
 import useToast from "../../hooks/useToast";
@@ -21,6 +21,9 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [registerErrors, setRegisterErrors] = useState({ registerEmail: '', registerPassword: '', confirmPassword: '' });
   const [isFinishedRegister, setIsFinishedRegister] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
   const [valid, setValid] = useState(true);
   const theme = useTheme();
   const showToast = useToast();
@@ -45,6 +48,39 @@ const LoginPage = () => {
 
   const handleToggle = () => {
     setRegisterChoice(!registerChoice);
+  };
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setForgotEmail('');
+    setLoading(false);
+  };
+
+  const handleForgotPassword = async () => {
+    setLoading(true);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!forgotEmail) {
+      setLoading(false);
+      return showToast('E-mail is required!', 'error');
+    }
+    if(!emailRegex.test(forgotEmail)) {
+      setLoading(false);
+      return showToast('Provide a valid e-mail!', 'error');
+    }
+
+    try {
+      const response = await nonAuthClient.sendForgotPasswordEmail(forgotEmail);
+      if(response.error) return showToast(response.error, 'error');
+
+      handleCloseModal();
+      showToast('Recovery e-mail send!', 'success');
+    } catch (error) {
+      showToast(error as string, 'error');
+    }
   };
 
   const clear = () => {
@@ -128,7 +164,7 @@ const LoginPage = () => {
       const response = await nonAuthClient.login(email, password);
       
       if (response.error) return showToast(response.error, 'error');
-      
+
         setToken(response.token as string);
         navigate('/chat');
     } catch (error) {
@@ -139,7 +175,8 @@ const LoginPage = () => {
   const handleRegister = async () => {
     if (!validateRegister()) return;
     try {
-      const response = await nonAuthClient.registerUser(registerEmail, registerPassword);
+      const response = await nonAuthClient.registerUser(registerEmail, registerPassword); 
+      
       if (response.error) return showToast(response.error, 'error');
 
       setIsFinishedRegister(true);
@@ -284,7 +321,7 @@ const LoginPage = () => {
               alignItems: 'center',
               pt: '0.7rem' 
             }}>
-              <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }}>
+              <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }} onClick={handleOpenModal}>
                 Forgot your password?
               </Typography>
               <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }} onClick={handleToggle}>
@@ -292,6 +329,36 @@ const LoginPage = () => {
               </Typography>
             </Box>
           </Box>
+          {/* Modal de Esqueci a Senha */}
+          <Dialog open={modalOpen} onClose={handleCloseModal}>
+            <DialogTitle>Forgot Password</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Email"
+                type="email"
+                fullWidth
+                variant="outlined"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal} color="primary" disabled={loading ? true : false}> 
+                Cancelar
+              </Button>
+              {loading ? 
+                <Box>
+                  <CircularProgress /> 
+                </Box>
+                : 
+                <Button onClick={handleForgotPassword} color="primary">
+                  Enviar
+                </Button>
+                }
+            </DialogActions>
+          </Dialog>
           <Box>
           </Box>
           <Box sx={{
@@ -331,8 +398,7 @@ const LoginPage = () => {
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center'
-        }}>
-        </Box>
+        }}/>
             
         {/* Form register */}
         <Box sx={{ 
