@@ -2,15 +2,15 @@ import { Box, Container, Paper, Typography, IconButton } from "@mui/material"
 import { Send } from '@mui/icons-material'
 import { theme } from "../../App"
 import ResponsiveDrawer from "./partial/ResponsiveDrawer"
-import StepperContainer from "./partial/StepperContainer"
 import { useEffect, useState } from "react"
 import { createApiClient } from "../../api/fetch"
 import useToast from "../../hooks/useToast"
 import { IUserSuggestion, SuggestionCard, SuggestionCardSkeleton } from "./partial/SuggestionCard"
 import { useUser } from "../../hooks/useUser"
+import QueryResponse from "./partial/QueryResponse"
 
 const ChatPage = () => {
-    const [promptSuggestions, setPromptSuggestion ] = useState<IUserSuggestion>({});
+    const [promptSuggestions, setPromptSuggestion ] = useState<IUserSuggestion>();
     const [isAnsweringUsersQuery, setIsAnsweringUsersQuery] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [usersQuery ,setUsersQuery] = useState('');
@@ -25,7 +25,13 @@ const ChatPage = () => {
                 const response = await apiClient.getPromptSuggestions();
     
                 if(response.error) return showToast(response.error);
-                setPromptSuggestion(response.data);
+
+                setPromptSuggestion({
+                    usersSuggestions: response.data,
+                    setterPromptChoice: setUsersQuery,
+                    setterTriggerResponse: setIsAnsweringUsersQuery
+                });
+                
                 setIsLoading(false);
             }
         };
@@ -127,7 +133,9 @@ const ChatPage = () => {
                             justifyContent: 'center',
                             alignItems: 'stretch'
                         }}>
-                            <StepperContainer />
+                            {usersQuery &&
+                                <QueryResponse query={ usersQuery }/>
+                            }
                         </Box>
                     }
                     

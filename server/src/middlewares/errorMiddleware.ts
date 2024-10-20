@@ -15,5 +15,5 @@ export const errorMiddleware = (
         });
     }
 
-    return res.status(500).json({data: null, error: 'Erro interno no servidor.'});
+    return res.status(500).json({data: null, error: 'Internal server error.'});
 }

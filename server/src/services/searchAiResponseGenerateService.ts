@@ -36,9 +36,8 @@ export default class SearchAiResponseGenerateService {
     try {
       const allSearchList =
         await this.searchEnginesRetriever.searchAllEnginesResulst(query);
-
       yield {type: 'firstStep'}
-
+      
       const filterPrompt = this.formatAiFilterPrompt(query, allSearchList);
       const filteredList: { urls: Array<string> } = await this.callAiAssistant(
         filterPrompt
@@ -47,6 +46,7 @@ export default class SearchAiResponseGenerateService {
       
       const extractor = new TavilyContentExtractor(filteredList);
       const data = await extractor.extractAll();
+      
       yield {type: 'thirdStep'}
     
       const finalPrompt = this.formatAiUserRequestPrompt(query, data.results);
@@ -58,14 +58,19 @@ export default class SearchAiResponseGenerateService {
       const llmInstanceWithSchema =
         this.llmInstanceStream.withStructuredOutput(markdownSchema);      
     
-    const stream = await llmInstanceWithSchema.stream(finalPrompt);
+      const stream = await llmInstanceWithSchema.stream(finalPrompt);
 
+      let previousContent = '';
       for await ( const chunk of stream){
         if(typeof chunk.response !== "string"){
-           continue;
+            continue;
         }
-        yield { type: 'content', content: chunk.response }
-      }
+        const newContent = chunk.response.slice(previousContent.length);
+        console.log(newContent);
+        
+        yield { type: 'content', content: newContent };
+        previousContent = chunk.response;
+    }
 
       yield { type: 'done'}
     } catch (error) {
@@ -135,10 +140,6 @@ export default class SearchAiResponseGenerateService {
         Based on the following query: "${userQuery}" and the content from various sources listed below, write a detailed,
         informative, and helpful search result report about the topic.
     
-        Ensure that each piece of information in the report is referenced by a number in brackets (e.g., [1], [2], etc.), and at the end of the report, include a references list with the corresponding URLs (in the format [1]: <URL>, [2]: <URL>, etc.).
-    
-        Do not call it a "report", but a "search result" and write it as such.
-    
         REMEMBER: FOR EACH PIECE OF INFORMATION, REFERENCE THE SOURCE BY THE CORRESPONDING NUMBER.
         MAKE SURE NOT TO MAKE UP OR USE INFORMATION YOU IMPLICITLY KNOW, INSTEAD ONLY GET INFORMATION FROM THE SOURCES.
         ALL INFORMATION IN THE REPORT MUST HAVE A REFERENCE TO THE SOURCE.
@@ -148,6 +149,12 @@ export default class SearchAiResponseGenerateService {
         Here is the content from the different sources:
     
         ${JSON.stringify(urlContents)}
+
+        Ensure that each piece of information in the report is referenced by a number link references ex: e.g.,
+        [1] (https://exemple.com).
+
+        In the end have a references section where each numbered reference is followed by the corresponding URL, formatted naturally in markdown ex: ([3](https://www.example.org/careers/software-developer/))
+        THIS STEP IS VERY IMPORTANT 
       `;
 
     let urlContentString = "";

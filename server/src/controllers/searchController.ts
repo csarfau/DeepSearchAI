@@ -16,13 +16,18 @@ export default class SearchController {
     try {
       const query = req.body.query;
 
-      const stream =
-        await this.searchAiResponseGenerageService.generateAiResponse(query);
-
+      const stream = this.searchAiResponseGenerageService.generateAiResponse(query);
+      
       res.setHeader("Content-Type", "text/plain");
       res.setHeader("Transfer-Encoding", "chunked");
 
       for await (const chunk of stream) {
+
+        if (chunk.type === 'error') {
+          res.write(JSON.stringify(chunk));
+          return res.end();
+        }
+        
         res.write(JSON.stringify(chunk));
       }
 
