@@ -6,6 +6,7 @@ import bcrypt, { compare } from 'bcrypt';
 import { createToken, verifyToken } from '../utils/token';
 import sendEmail from '../services/sendEmail';
 import createEmailToRecoverPassword from '../services/emailSenderPass';
+import { CustomError } from '../helpers/customError';
 
 const userRepository = new UserRepository(); 
 const suggestionService = new SuggestionGenerationService();
@@ -31,7 +32,7 @@ export default class UserController {
         const user = await userRepository.getUserByEmail(email);
 
         if(!user) {
-            return res.status(401).json({ message: "E-mail not found." });
+            return res.status(404).json({ message: "E-mail not found." });
         }
 
         await createEmailToRecoverPassword(user.id as string, email);
@@ -96,19 +97,15 @@ export default class UserController {
         const { password } = req.body;
         const token = req.headers.authorization?.split(' ')[1] as string;
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        try {
             const authenticatedUser = verifyToken(token);
+
             if(!authenticatedUser) {
-                throw new Error();
+                throw new CustomError(401, "Invalid token, try again.");
             }
+
             const email = authenticatedUser.email;
             return res.status(200).json({ 
                 data: await userRepository.resetPassword(hashedPassword, email)
             });
-
-        } catch (error) {
-            return res.status(401).json({ message: "Invalid token, try again." });
-        }
     }
 }
