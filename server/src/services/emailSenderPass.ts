@@ -2,7 +2,7 @@ import { createToken } from "../utils/token";
 import sendEmail from "./sendEmail";
 
 const createEmailToRecoverPassword = async (id: string, email: string) => {
-    const token = createToken({ id , email } , { expiresIn: '1h' });
+    const token = createToken({ id , email } , { expiresIn: '15min' });
 
     const html = `<!DOCTYPE html>
     <html lang="pt-br">

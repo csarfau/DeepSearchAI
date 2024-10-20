@@ -17,9 +17,7 @@ async function sendEmail(toEmail: string, subject: string, emailContent: string)
             subject: subject,
             html: emailContent
         })
-    } catch (error) {
-        console.log("erro ao enviar email", error);
-        
+    } catch (error) {        
     }
 }
 
