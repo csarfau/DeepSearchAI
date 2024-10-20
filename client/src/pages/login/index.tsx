@@ -2,9 +2,10 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from "react";
-import { login, registerUser } from "../../api/fetch";
 import useToast from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
+import { createApiClient } from "../../api/fetch";
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
@@ -23,6 +24,7 @@ const LoginPage = () => {
   const theme = useTheme();
   const showToast = useToast();
   const navigate = useNavigate();
+  const { setToken } = useUser();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowRegisterPassword = () => setShowRegisterPassword((show) => !show);
@@ -116,37 +118,38 @@ const LoginPage = () => {
     return valid;
   }
 
-  const handleLogin = async () => {    
-    if(!validateLogin()) return
+  const nonAuthClient = createApiClient({ token: null, userId: null });
 
+  const handleLogin = async () => {
+
+    if (!validateLogin()) return;
     try {
-      const response = await login(email, password);
-      
-      if (response.token) {
-        navigate('/chat');
-      }
+      const response = await nonAuthClient.login(email, password);
 
+      if (response.error) return showToast(response.error, 'error');
+      
+        setToken(response.token as string);
+        navigate('/chat');
     } catch (error) {
       showToast(error as string, 'error');
     }
-  }
+  };
 
   const handleRegister = async () => {
-    if(!validateRegister()) return
-
+    if (!validateRegister()) return;
     try {
-      const response = await registerUser(registerEmail, registerPassword);
+      const response = await nonAuthClient.registerUser(registerEmail, registerPassword);
       console.log(response);
       
-      if (response.data) {
+      if (response.error) return showToast(response.error, 'error');
+    
         showToast('Account created!', 'success');
         setRegisterChoice(false);
-      }
-
+      
     } catch (error) {
       showToast(error as string, 'error');
     }
-  }
+  };
 
   return (
     <Box sx={{
@@ -237,9 +240,8 @@ const LoginPage = () => {
                 }
               </FormControl>
               <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <InputLabel>Password</InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
                   type={ showPassword ? 'text' : 'password' }
                   value={ password }
                   onChange={(e) => setPassword(e.target.value)}
@@ -292,7 +294,7 @@ const LoginPage = () => {
             display: 'flex',
             flexDirection: 'column',
             gap: '0.5rem',
-            maxWidth: '30rem'
+            maxWidth: '22rem'
           }}>
             <Button 
               variant="contained" 
@@ -395,9 +397,8 @@ const LoginPage = () => {
                       } 
                   </FormControl>
                   <FormControl variant="outlined" sx={{ position: 'relative'}}>
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                    <InputLabel>Password</InputLabel>
                     <OutlinedInput
-                      id="outlined-adornment-password"
                       type={showRegisterPassword ? 'text' : 'password'}
                       value={registerPassword}
                       onChange={(e) => setRegisterPassword(e.target.value)}
@@ -429,9 +430,8 @@ const LoginPage = () => {
                       }
                   </FormControl>
                   <FormControl variant="outlined" sx={{position: 'relative'}}>
-                    <InputLabel htmlFor="outlined-adornment-password">Confirm Password</InputLabel>
+                    <InputLabel>Confirm Password</InputLabel>
                     <OutlinedInput
-                      id="outlined-adornment-password"
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -514,7 +514,7 @@ const LoginPage = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.5rem',
-                maxWidth: '30rem'
+                maxWidth: '22rem'
               }}>
                 <Button 
                   onClick={handleRegister}
