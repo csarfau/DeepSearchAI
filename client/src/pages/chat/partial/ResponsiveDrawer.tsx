@@ -51,10 +51,10 @@ export default function ResponsiveDrawer() {
                     </ListSubheader>
                 }>
                     <Divider />
-                    <ListItemButton sx={{mt: '1rem', 
+                    <ListItemButton sx={{mt: '1rem',                        
                         ...(isSmallScreen ? {px: '1.5rem'} : { px: '0.5rem' })}}>
-                        <ListItemIcon>
-                            <Home />
+                        <ListItemIcon> 
+                            <Home sx={{color: theme.palette.secondary.main, width: '1.3rem'}}/>
                         </ListItemIcon>
                         <ListItemText 
                             sx={{color: 
@@ -65,7 +65,7 @@ export default function ResponsiveDrawer() {
                     <ListItemButton sx={{  
                         ...(isSmallScreen ? {px: '1.5rem'} : { px: '0.5rem' }) }}>
                         <ListItemIcon>
-                            <Person />
+                            <Person sx={{color: theme.palette.secondary.main, width: '1.3rem'}} />
                         </ListItemIcon>
                         <ListItemText 
                             sx={{color: 
@@ -76,7 +76,7 @@ export default function ResponsiveDrawer() {
                     <ListItemButton sx={{  
                         ...(isSmallScreen ? {px: '1.5rem'} : { px: '0.5rem' }) }}>
                         <ListItemIcon>
-                            <Receipt />
+                            <Receipt sx={{color: theme.palette.secondary.main, width: '1.3rem'}} />
                         </ListItemIcon>
                         <ListItemText 
                             sx={{color: 

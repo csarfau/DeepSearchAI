@@ -4,10 +4,9 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
 import { theme } from '../../../App';
+import { LinearProgress, LinearProgressProps } from '@mui/material';
 
 const steps = [
     {
@@ -29,6 +28,22 @@ const steps = [
         progress: 100,
     },
 ];
+
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+    return (
+      <Box sx={{width: '100%', display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', mr: 1,  }}>
+          <LinearProgress variant="determinate"  value={props.value}/>
+        </Box>  
+        <Box>
+          <Typography
+            variant="subtitle2"
+            sx={{ color: 'text.secondary' }}
+          >{`${props.value}%`}</Typography>
+        </Box>
+      </Box>
+    );
+}
 
 export default function StepperContainer() {
     const [activeStep, setActiveStep] = useState(0);
@@ -53,6 +68,8 @@ export default function StepperContainer() {
             alignItems: 'center', 
             justifyContent: 'start',
             height: '100%',
+            pt: '3rem',
+            boxSizing: 'border-box'
         }}>
             <Box sx={{textAlign: 'center'}}>
                 <Typography variant='h5' color={theme.palette.text.primary}>
@@ -62,33 +79,15 @@ export default function StepperContainer() {
                     Follow the steps as we gather, evaluate, and craft the best possible response to your query.
                 </Typography>
             </Box>
-            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                <CircularProgress variant="determinate" value={progress}/>
-                    <Box
-                        sx={{
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        right: 0,
-                        position: 'absolute',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                        }}
-                    >
-                        <Typography
-                        variant="caption"
-                        component="div"
-                        sx={{ color: 'text.secondary' }}
-                        >{`${progress}%`}</Typography>
-                    </Box>
+            <Box sx={{ width: '100%' }}>
+                <LinearProgressWithLabel value={progress} />
             </Box>
             <Box sx={{
                 display: 'flex', 
                 justifyContent: 'center',
                 gap: '0.5rem'
                 }}>
-                <Box sx={{ width: 400 }}>
+                <Box sx={{ width: '15rem' }}>
                     <Stepper activeStep={activeStep} orientation="vertical">
                     {steps.map((step) => (
                         <Step key={step.label}>
@@ -101,11 +100,6 @@ export default function StepperContainer() {
                         </Step>
                     ))}
                     </Stepper>
-                    {activeStep === steps.length && (
-                    <Paper square elevation={0} sx={{ p: 3 }}>
-                        <Typography>All steps completed - you're finished</Typography>
-                    </Paper>
-                    )}
                 </Box>
             </Box>
         </Box>
