@@ -1,4 +1,4 @@
-
+import { redirect } from "react-router-dom";
 
 interface IFetchResponse {
     token?: string,
@@ -13,164 +13,107 @@ export interface ITheme {
     name: string
 }
 
-export const fetchThemes = async ():Promise<IFetchResponse> => {
-    try {
-        const response = await fetch(baseUrl + '/themes');
-        
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.error }
-        } 
-
-        const data = await response.json();
-        
-        return { ...data };
-    } catch (error: any) {
-        return { error: error.message }
-    }
+interface AuthOptions {
+    token: string | null;
+    userId: string | null;
 }
 
-export const saveUserThemes = async (userID: string, usersThemes:Array<string>):Promise<IFetchResponse> => {
-    try {
-        const response = await fetch(baseUrl + `/user/${userID}/themes`, {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json', 
-            },
-            body: JSON.stringify({ 
-                usersThemes
-            }),
-        });
+const createAuthenticatedFetch = (authOptions: AuthOptions) => {
 
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.error }
-        } 
+    return async (url: string, options: RequestInit = {}): Promise<IFetchResponse> => {
 
-        const data = await response.json();
-        
-        return { ...data };
-    } catch (error: any) {
-        return { error: error.message }
-    }
-}
+        if (!authOptions.token || !authOptions.userId) {
+            redirect('/');
+            return { error: 'Not authenticated' };
+        }
 
-export const login = async (email: string, password: string): Promise<IFetchResponse> => {
-    try {
-        const response = await fetch(`${baseUrl}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', 
-            },
-            body: JSON.stringify({ 
-                email,
-                password
-            }),
-        });
-        
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.message }
-        } 
+        const headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${authOptions.token}`,
+            'Content-Type': 'application/json',
+        };
 
-        const data = await response.json();
-        
-        return { ...data };
-    } catch (error: any) {
-        return { error: error }
-    }
-}
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers,
+            });
 
-export const registerUser = async (email: string, password: string): Promise<IFetchResponse> => {
-    try {
-        const response = await fetch(`${baseUrl}/user`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', 
-            },
-            body: JSON.stringify({ 
-                email,
-                password
-            }),
-        });
-        
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.error }
-        } 
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                return { error: errorResponse.error };
+            }
 
-        const data = await response.json();
-        
-        return { ...data };
-    } catch (error: any) {
-        return { error: error.message }
-    }
-}
+            const data = await response.json();
+            return { ...data };
+        } catch (error: any) {
+            return { error: error.message };
+        }
+    };
+};
 
-export const getPromptSuggestions = async (userID: string) => {
-    try {
-        const response = await fetch(baseUrl + `/user/${userID}/suggestions`);
+export const createApiClient = (authOptions: AuthOptions) => {
+    
+    const authenticatedFetch = createAuthenticatedFetch(authOptions);
 
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.error }
-        } 
+    return {
+        fetchThemes: async (): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + '/themes');
+        },
 
-        const data = await response.json();
-        
-        return { ...data };
-    } catch (error: any) {
-        return { error: error.message }
-    }
-}
+        saveUserThemes: async (usersThemes: Array<string>): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/user/${authOptions.userId}/themes`, {
+                method: 'POST',
+                body: JSON.stringify({ usersThemes }),
+            });
+        },
 
-export const sendForgotPasswordEmail = async (email: string): Promise<IFetchResponse> => {
-    try {
-        const response = await fetch(`${baseUrl}/user/recovery-pass`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', 
-            },
-            body: JSON.stringify({ 
-                email,
-            }),
-        });
-        
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.message }
-        } 
+        login: async (email: string, password: string): Promise<IFetchResponse> => {
+            try {
+                const response = await fetch(`${baseUrl}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
 
-        const data = await response.json();
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    return { error: errorResponse.error };
+                }
 
-        return { ...data };
-    } catch (error: any) {
-        return { error: error }
-    }
-}
+                const data = await response.json();
+                return { ...data };
+            } catch (error: any) {
+                return { error: error.message };
+            }
+        },
 
-export const resetPassword = async (password: string, token: string): Promise<IFetchResponse> => {
-    try {
-        const response = await fetch(`${baseUrl}/user/reset-pass`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json', 
-            },
-            body: JSON.stringify({ 
-                password
-            }),
-        });
+        registerUser: async (email: string, password: string): Promise<IFetchResponse> => {
+            try {
+                const response = await fetch(`${baseUrl}/user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
 
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            return { error: errorResponse.message }
-        } 
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    return { error: errorResponse.error };
+                }
 
-        const data = await response.json();
+                const data = await response.json();
+                return { ...data };
+            } catch (error: any) {
+                return { error: error.message };
+            }
+        },
 
-        return { ...data };
-    } catch (error: any) {
-        return { error: error }
-    }
-}
+        getPromptSuggestions: async (): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/user/${authOptions.userId}/suggestions`);
+        },
+    };
+};
