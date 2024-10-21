@@ -94,7 +94,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query }) 
                             fontSize: '1rem',
                             color: (theme: Theme) => theme.palette.primary.main,
                             position: 'relative',
-                            fontWeight: '500',
+                            fontWeight: 'bold',
                             marginRight: '1.1rem',
                             maxWidth: '30rem',
                             '-webkit-box-orient': 'vertical',

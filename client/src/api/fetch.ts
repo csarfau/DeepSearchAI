@@ -222,7 +222,10 @@ export const createApiClient = (authOptions: AuthOptions) => {
             } catch (error: any) {
                 return { error: error.message }
             }
-        }
+        },
 
+        getLatestQueries: async (): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/searches/latest`);
+        }
     };
 };
