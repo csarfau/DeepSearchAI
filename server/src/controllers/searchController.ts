@@ -17,26 +17,6 @@ export default class SearchController {
     const searchId = req.params.id;
     const user = req.user;
 
-<<<<<<< HEAD
-      const stream = this.searchAiResponseGenerageService.generateAiResponse(query);
-      
-      res.setHeader("Content-Type", "text/plain");
-      res.setHeader("Transfer-Encoding", "chunked");
-
-      for await (const chunk of stream) {
-
-        if (chunk.type === 'error') {
-          res.write(JSON.stringify(chunk));
-          return res.end();
-        }
-        
-        res.write(JSON.stringify(chunk));
-      }
-
-      return res.end();
-    } catch (error) {
-      throw error;
-=======
     if (!user)
       return new CustomError(401, "Unauthorized access. Please log in.");
 
@@ -44,7 +24,6 @@ export default class SearchController {
 
     if (!search) {
       return res.status(404).json({ error: "Search not found!" });
->>>>>>> main
     }
 
     if (user.id !== search.user_id)
@@ -66,6 +45,23 @@ export default class SearchController {
     if (userSearchs.length === 0) return new CustomError(404, "No data found!");
     
     return res.status(200).json(userSearchs);
+  };
+
+  public getLatestSearchsByUserId = async (req: Request, res: Response) => {
+    const user = req.user;
+    
+    if (!user)
+      return new CustomError(401, "Unauthorized access. Please log in!");
+    
+    const userSearchs = await this.searchRepository.getLatestQueries(
+      user.id
+    );
+    
+    if (userSearchs.length === 0) return new CustomError(404, "No data found!");
+    
+    return res.status(200).json({
+      data: userSearchs
+    });
   };
 
   public searchRetrieve = async (req: Request, res: Response) => {
@@ -116,4 +112,5 @@ export default class SearchController {
 
     return res.status(200).json(deleted);
   };
+
 }

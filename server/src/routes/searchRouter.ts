@@ -11,5 +11,5 @@ searchRouter.get('/search/:id', searchController.getSearchById.bind(searchContro
 searchRouter.get('/searches', searchController.getAllSearchsByUserId.bind(searchController));
 searchRouter.post('/search', searchController.searchRetrieve.bind(searchController));
 searchRouter.delete('/search/:id', searchController.deleteSearchById.bind(searchController));
-
+searchRouter.get('/searches/latest', searchController.getLatestSearchsByUserId.bind(searchController));
 export default searchRouter;

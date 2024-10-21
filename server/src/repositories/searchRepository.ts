@@ -40,4 +40,14 @@ export default class SearchRepository implements ISearchRepository {
 
     return deleted[0];
   }
+
+  public async getLatestQueries(user_id: string): Promise<Array<Partial<IUserSearch>>> {
+    const searchs = await db("user_searchs")
+      .select("id", "query", "created_at")
+      .where({ user_id })
+      .orderBy("created_at", "desc")
+      .limit(5);
+
+    return searchs;
+  } 
 }
