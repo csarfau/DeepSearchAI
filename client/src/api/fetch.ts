@@ -177,22 +177,22 @@ export const createApiClient = (authOptions: AuthOptions) => {
             try {
                 const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { 
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json' 
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Accept': 'application/json'
                     },
-                    mode: 'no-cors',
                 });
-            console.log(await response.json());
-            
+
                 if (!response.ok) {
-                    throw new Error;
+                    const errorData = await response.json();
+                    console.error('Google API error:', errorData);
+                    throw new Error(errorData.error_description || 'Failed to fetch user info');
                 } 
 
                 const data = await response.json();
-
-                return { ...data };
+                return data;
             } catch (error: any) {
-                return { error }
+                console.error('Error fetching Google user info:', error);
+                return { error: error.message || 'An unexpected error occurred' };
             }
         }
 
