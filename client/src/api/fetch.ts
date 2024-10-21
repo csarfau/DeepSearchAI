@@ -6,6 +6,12 @@ interface IFetchResponse {
     error?: string
 }
 
+interface IGoogleResponse {
+    email?: string,
+    sub?: string,
+    error?: any
+}
+
 const baseUrl = 'http://localhost:5000/api';
 
 export interface ITheme {
@@ -68,14 +74,14 @@ export const createApiClient = (authOptions: AuthOptions) => {
             });
         },
 
-        login: async (email: string, password: string): Promise<IFetchResponse> => {
+        login: async (email: string, password?: string, googleId?: string): Promise<IFetchResponse> => {
             try {
                 const response = await fetch(`${baseUrl}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email, password }),
+                    body: JSON.stringify({ email, password, googleId }),
                 });
 
                 if (!response.ok) {
@@ -164,6 +170,29 @@ export const createApiClient = (authOptions: AuthOptions) => {
                 return { ...data };
             } catch (error: any) {
                 return { error: error.message }
+            }
+        },
+
+        userGoogleInfos: async (accessToken: string): Promise<IGoogleResponse> => {
+            try {
+                const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { 
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json' 
+                    },
+                    mode: 'no-cors',
+                });
+            console.log(await response.json());
+            
+                if (!response.ok) {
+                    throw new Error;
+                } 
+
+                const data = await response.json();
+
+                return { ...data };
+            } catch (error: any) {
+                return { error }
             }
         }
 
