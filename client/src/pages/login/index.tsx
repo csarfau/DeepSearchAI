@@ -163,16 +163,14 @@ const LoginPage = () => {
     onSuccess: async (response) => {
       try {
         const userInfo = await nonAuthClient.userGoogleInfos(response.access_token);
-        if (!userInfo) return showToast("Google login failed. Please try again.", "error");
-        
-        const loginResponse = await nonAuthClient.login(userInfo.email as string, userInfo.sub as string);
-        if (!loginResponse) return showToast("Google login failed. PLease try again.", "error");
+        if (userInfo.error) return showToast("Google login failed. Please try again.", "error");
+        const emptyPassword = '';
+        const loginResponse = await nonAuthClient.login(userInfo.email as string, emptyPassword, userInfo.sub as string);
+        if (loginResponse.error) return showToast("Google login failed. PLease try again.", "error");
 
         setToken(loginResponse.token as string);
         navigate('/chat');
       } catch (error) {
-        console.log(error);
-        
         return showToast(error as string, 'error');
       }
     },
@@ -181,7 +179,6 @@ const LoginPage = () => {
       showToast('Google login failed. Please try again.', 'error');
     },
     flow: 'implicit',
-    prompt: 'consent',
     scope: 'profile email',
   });
 
