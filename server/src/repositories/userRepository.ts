@@ -10,25 +10,30 @@ export default class UserRepository implements IUserRepository {
             .returning('*');
         return newUser[0];
     }
+    
+    public async createGoogleUser(user: IUser): Promise<Partial<IUser>> {
+        const newUser = await db('users')
+            .insert({ email: user.email, google_id: user.google_id })
+            .returning('*');
+        return newUser[0];
+    }
 
     public async getUserByID(userID: string): Promise<Partial<IUser> | undefined > {
-
         const user = await db('users')
             .select('id', 'email')
-            .where({id: userID})
+            .where({ id: userID })
             .first();
-        
-        return user
+
+        return user;
     }
 
     public async getUserByEmail(userEmail: string): Promise<Partial<IUser> | undefined > {
-
         const user = await db('users')
-            .select('id', 'password', 'email')
+            .select('id', 'password', 'email', 'google_id')
             .where({email: userEmail})
             .first();
-        
-        return user
+
+        return user;
     }
 
     public async resetPassword(password: string, email: string): Promise<Partial<IUser> | undefined> {
@@ -38,7 +43,7 @@ export default class UserRepository implements IUserRepository {
                 password
             })
             .returning('*');
-            
+
         return user[0];
     }
 

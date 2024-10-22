@@ -3,7 +3,8 @@ import { Theme, UserTheme } from "knex/types/tables";
 export interface IUser {
     id?: string,
     email: string,
-    password: string
+    password?: string,
+    google_id?: string
 }
 
 export interface ILoginTokenPayload {
@@ -18,6 +19,7 @@ declare module 'express-serve-static-core' {
 
 export interface IUserRepository {
     createUser(userData: IUser): Promise<Partial<IUser> | undefined>;
+    createGoogleUser(userData: IUser): Promise<Partial<IUser> | undefined>;
     getUserByID(userID: string): Promise<Partial<IUser> | undefined>;
     getUserByEmail(userEmail: string): Promise<Partial<IUser> | undefined>;
     insertUsersTheme(userID: string, themesIDs:Array<string>):Promise<Array<UserTheme>>
