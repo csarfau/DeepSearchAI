@@ -2,10 +2,11 @@ import React, { useState, useCallback, useEffect, useRef, ComponentPropsWithoutR
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Box, Theme } from '@mui/material';
+import { Box, Button, Theme } from '@mui/material';
 import { createApiClient, ResponseStreamType } from '../../../api/fetch';
 import { useUser } from '../../../hooks/useUser';
 import StepperContainer from './StepperContainer';
+import ErrorAlert from './ErrorAlert';
 
 declare module "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus" {
     const style: { [key: string]: React.CSSProperties };
@@ -13,19 +14,22 @@ declare module "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus" {
 
 interface EnhancedQueryResponseProps {
     query: string;
+    closeResponseAreaSetter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query }) => {
+const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, closeResponseAreaSetter }) => {
 
     const [searchResults, setSearchResults] = useState<{
             type: ResponseStreamType;
             content: string;
+            message?: string
         }>({
             type: 'init',
             content: ''
         });
     
     const [currentStep, setCurrentStep] = useState<ResponseStreamType>('init');
+    const [responseError, setResponseError] = useState('');
 
     const { token, user, isLoading: isUserLoading } = useUser();
     const scrollBoxRef = useRef<HTMLDivElement>(null);
@@ -44,31 +48,28 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query }) 
         });
     
         try {
-        await apiClient.streamingSearch(query, (response) => {
-            console.log(response);
-            
+            await apiClient.streamingSearch(query, (response) => {
             setSearchResults(prev => ({
                 type: response.type,
                 content: prev.content + (response.content || '')
             }));
-
+            
+            if (response.type === 'error') setResponseError(response.message as string)
             if (response.type !== 'content') setCurrentStep(response.type);
             
         });
-        } catch (error) {
-        console.error('Search error:', error);
-        }
+        
         }
     }, [query, isUserLoading, user, token]);
 
     useEffect(() => {
         handleSearch();
-    }, [handleSearch]);
+    }, []);
 
     return (
         <>
-        {searchResults.type === 'content' || searchResults.type === 'done' || searchResults.type === 'error' ?
-                <Box
+        {searchResults.type === 'content' || searchResults.type === 'done' || searchResults.type === 'store' ?
+            (    <Box
                     ref={scrollBoxRef}
                     sx={{
                         width: '100%',
@@ -95,7 +96,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query }) 
                             color: (theme: Theme) => theme.palette.primary.main,
                             position: 'relative',
                             fontWeight: 'bold',
-                            marginRight: '1.1rem',
+                            marginRight: '1.3rem',
                             maxWidth: '30rem',
                             '-webkit-box-orient': 'vertical',
                             '-webkit-line-clamp': 1,
@@ -133,6 +134,13 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query }) 
                             margin: '0 auto'  
                         }}
                     >
+                        {searchResults.type === 'store' &&
+                            <Button variant='text' onClick={() => {
+                                closeResponseAreaSetter(false);
+                            }}>
+                                New query
+                            </Button>
+                        }
                         <ReactMarkdown
                             components={{
                                 code: ({ inline, className, children, ...props }: ComponentPropsWithoutRef<'code'> & { inline?: boolean }) => {
@@ -159,13 +167,28 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query }) 
                         >
                             { searchResults.content }
                         </ReactMarkdown>
+                        {searchResults.type === 'store' &&
+                            <Button variant='text' onClick={() => closeResponseAreaSetter(false)}>New query</Button>
+
+                        }
                     </Box>
                 </Box>
 
+            )
             :
-
-                <StepperContainer currentStep={ currentStep }/>
-            }
+            (
+                <>
+                    {!responseError  &&
+                        <StepperContainer currentStep={currentStep} />
+                    }
+                    {responseError && (
+                        <ErrorAlert
+                            closeResponseAreaSetter={closeResponseAreaSetter}
+                            message={responseError}
+                        />
+                    )}
+                </>
+            )}
         
         </>
     );

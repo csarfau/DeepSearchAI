@@ -52,7 +52,7 @@ const createAuthenticatedFetch = (authOptions: AuthOptions) => {
     };
 };
 
-export type ResponseStreamType = 'init' | 'firstStep' | 'secondStep' | 'thirdStep' | 'content' | 'done' | 'error';
+export type ResponseStreamType = 'init' | 'firstStep' | 'secondStep' | 'thirdStep' | 'content' | 'done' | 'error' | 'message' | 'store';
 
 export const createApiClient = (authOptions: AuthOptions) => {
     
@@ -123,7 +123,8 @@ export const createApiClient = (authOptions: AuthOptions) => {
             onContent: (
                 content: {
                     type: ResponseStreamType, 
-                    content?: string
+                    content?: string,
+                    message?: string
                 }
             ) => void
         ): Promise<void | { error: any }> => {
@@ -226,6 +227,18 @@ export const createApiClient = (authOptions: AuthOptions) => {
 
         getLatestQueries: async (): Promise<IFetchResponse> => {
             return authenticatedFetch(baseUrl + `/searches/latest`);
+        },
+
+        getAllQueries: async(limit: number, offset:number, filterBy?: string): Promise<IFetchResponse> => {
+            const url = filterBy  ?
+                `/searches?limit=${limit}&offset=${offset}&filterBy=${filterBy}`
+                : 
+                `/searches?limit=${limit}&offset=${offset}`
+            return authenticatedFetch(baseUrl + url)
+        },
+
+        getQueryById: async (id: string): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/search/${id}`)
         }
     };
 };

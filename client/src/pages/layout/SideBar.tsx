@@ -1,4 +1,4 @@
-import { memo, useState} from 'react';
+import { useState} from 'react';
 import Box from '@mui/material/Box';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Button from '@mui/material/Button';
@@ -12,10 +12,11 @@ import ListSubheader from '@mui/material/ListSubheader';
 import { useTheme } from '@mui/material/styles';
 import {  Home, Person } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
-import MemoizedQueryList from './QueryHistorySidebar';
+import MemoizedQueryList, { IQueryList } from './QueryList'; 
 import { useNavigate } from 'react-router-dom';
 
-const ResponsiveDrawer = () => {
+
+const SideBard:React.FC<IQueryList> = (queryListProps) => {
     const [open, setOpen] = useState(false);
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
@@ -26,7 +27,6 @@ const ResponsiveDrawer = () => {
     };
 
     const ListDrawer = () => {
-
         return (
             <Box
                 sx={{                     
@@ -80,7 +80,7 @@ const ResponsiveDrawer = () => {
                                 primary={'Profile'} 
                         />
                     </ListItemButton>
-                    <MemoizedQueryList />
+                    <MemoizedQueryList {...queryListProps}/>
                 </List>
             </Box>  
             )
@@ -126,6 +126,4 @@ const ResponsiveDrawer = () => {
     );
 }
 
-const MemoizedResponsiveDrawer = memo(ResponsiveDrawer);
-
-export default MemoizedResponsiveDrawer;
+export default SideBard;
