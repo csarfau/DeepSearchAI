@@ -15,6 +15,8 @@ export default class UserController {
 
     public async createUser(req: Request, res: Response) {
         const { email, password } = req.body;
+        const userExists = await userRepository.getUserByEmail(email);
+        if(userExists) throw new CustomError(400, "User already exists.");
 
         const user: IUser = {
             email,
@@ -26,13 +28,22 @@ export default class UserController {
         });
     }
 
+    private async createGoogleUser(email: string, google_id: string) {
+        const user: IUser = {
+            email,
+            google_id
+        }
+
+        return await userRepository.createGoogleUser(user);
+    }
+
     public async sendRecoveryEmail(req: Request, res: Response) {
         const { email } = req.body;
 
         const user = await userRepository.getUserByEmail(email);
 
         if(!user) {
-            return res.status(404).json({ message: "E-mail not found." });
+            throw new CustomError(404, "E-mail not found.");
         }
 
         await createEmailToRecoverPassword(user.id as string, email);
@@ -40,21 +51,37 @@ export default class UserController {
     }
 
     public async login(req: Request, res: Response) {
-        const { email, password } = req.body;
+        const { email, password, googleId } = req.body;
+
+        if(googleId) {
+            const user = await userRepository.getUserByEmail(email);
+
+            if(!user) {
+                const user = await this.createGoogleUser(email, googleId);
+                const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
+                return res.status(201).json({ token });
+            }
+
+            const authGoogle = user.google_id === googleId;
+            if(!authGoogle) throw new CustomError(401, "Credentials doesn't match.");
+
+            const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
+            return res.status(200).json({ token });
+        }
         
         const user = await userRepository.getUserByEmail(email);
         if(!user) {
-            return res.status(401).json({ message: "Credentials not found." });
+            throw new CustomError(404, "Credentials not found.");
         }
 
         const comparePassword = await compare(password as string, user.password as string);
         if(!comparePassword) {
-            return res.status(401).json({ message: "Credentials not found." });
+            throw new CustomError(401, "Credentials doesn't match.");
         }
 
         const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
 
-        return res.status(200).json({token});
+        return res.status(200).json({ token });
     } 
 
     public async saveThemeSuggestions(req: Request, res: Response) {

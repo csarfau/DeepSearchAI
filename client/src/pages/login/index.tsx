@@ -6,6 +6,7 @@ import useToast from "../../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { createApiClient } from "../../api/fetch";
+import { useGoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
@@ -23,7 +24,7 @@ const LoginPage = () => {
   const [modalOpen, setModalOpen] = useState(false); 
   const [loading, setLoading] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
-  const [valid, setValid] = useState(true);
+  const [googleLoginAttempted, setGoogleLoginAttempted] = useState(false);
   const theme = useTheme();
   const showToast = useToast();
   const navigate = useNavigate();
@@ -76,14 +77,13 @@ const LoginPage = () => {
       if(response.error) return showToast(response.error, 'error');
 
       handleCloseModal();
-      showToast('Recovery e-mail send!', 'success');
+      return showToast('Recovery e-mail send!', 'success');
     } catch (error) {
-      showToast(error as string, 'error');
+      return showToast(error as string, 'error');
     }
   };
 
   const clear = () => {
-    setValid(false);
     setPassword('');
     setRegisterPassword('');
     setEmail('');
@@ -102,23 +102,18 @@ const LoginPage = () => {
 
     if (!email) {
       newErrors.email = 'E-mail is required!';
-      setValid(false);
     } else if (!emailRegex.test(email)) {
       newErrors.email = 'Provide a valid e-mail!';
-      setValid(false);
     }
 
     if (!password) {
       newErrors.password = 'Password is required!';
-      setValid(false);
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-      setValid(false);
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
     setErrors(newErrors);
-    setValid(true)
-    return valid;
+    return Object.values(newErrors).every(error => error === '');
   }
 
   const validateRegister = () => {
@@ -127,49 +122,72 @@ const LoginPage = () => {
 
     if (!registerEmail) {
       newErrors.registerEmail = 'E-mail is required!';
-      setValid(false);
     } else if (!emailRegex.test(registerEmail)) {
       newErrors.registerEmail = 'Provide a valid e-mail!';
-      setValid(false);
     }
 
     if (!registerPassword) {
       newErrors.registerPassword = 'Password is required!';
-      setValid(false);
     } else if (registerPassword.length < 6) {
       newErrors.registerPassword = 'Password must be at least 6 characters';
-      setValid(false);
     }
 
     if (!confirmPassword) {
       newErrors.confirmPassword = 'Confirm password is required';
-      setValid(false);
     } else if (confirmPassword !== registerPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
-      setValid(false);
     }
 
     setRegisterErrors(newErrors);
-    setValid(true)
-    return valid;
+    return Object.values(newErrors).every(error => error === '');
   }
 
   const nonAuthClient = createApiClient({ token: null, userId: null });
 
   const handleLogin = async () => {
-
     if (!validateLogin()) return;
+
     try {
       const response = await nonAuthClient.login(email, password);
 
       if (response.error) return showToast(response.error, 'error');
 
         setToken(response.token as string);
-        navigate('/chat');
+        return navigate('/chat');
     } catch (error) {
-      showToast(error as string, 'error');
+      return showToast(error as string, 'error');
     }
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const userInfo = await nonAuthClient.userGoogleInfos(response.access_token);
+        if (userInfo.error) return showToast("Google login failed. Please try again.", "error");
+        const emptyPassword = '';
+        const loginResponse = await nonAuthClient.login(userInfo.email as string, emptyPassword, userInfo.sub as string);
+        if (loginResponse.error) return showToast("Google login failed. PLease try again.", "error");
+
+        setToken(loginResponse.token as string);
+        navigate('/chat');
+      } catch (error) {
+        return showToast(error as string, 'error');
+      }
+    },
+    onError: (errorResponse) => {
+      console.error('Google login error:', errorResponse);
+      showToast('Google login failed. Please try again.', 'error');
+    },
+    flow: 'implicit',
+    scope: 'profile email',
+  });
+
+  useEffect(() => {
+    if (googleLoginAttempted) {
+      handleGoogleLogin();
+      setGoogleLoginAttempted(false);
+    }
+  }, [googleLoginAttempted, handleGoogleLogin]);
 
   const handleRegister = async () => {
     if (!validateRegister()) return;
@@ -177,12 +195,12 @@ const LoginPage = () => {
       const response = await nonAuthClient.registerUser(registerEmail, registerPassword);
 
       if (response.error) return showToast(response.error, 'error');
-    
-        showToast('Account created!', 'success');
-        setRegisterChoice(false);
-      
+
+      setRegisterChoice(false);
+      return showToast('Account created!', 'success');
+
     } catch (error) {
-      showToast(error as string, 'error');
+      return showToast(error as string, 'error');
     }
   };
 
@@ -369,7 +387,13 @@ const LoginPage = () => {
               LOG IN
             </Button>
             <Typography sx={{alignSelf: 'center'}}>or</Typography>
-            <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>CONTINUE WITH GOOGLE</Button>
+            <Button 
+              variant="outlined" 
+              size="large" sx={{ border: theme.borders.primary }}
+              onClick={() => setGoogleLoginAttempted(true)}
+            >
+                CONTINUE WITH GOOGLE
+            </Button>
           </Box>
         </Box>
 
