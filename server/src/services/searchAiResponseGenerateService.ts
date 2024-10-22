@@ -109,7 +109,7 @@ export default class SearchAiResponseGenerateService {
 
       yield { type: "done", content: "" };
     } catch (error) {
-      throw error;
+      yield { type: "error", message: 'Error in process the data, try again with another prompt format.' };
     }
   }
 
@@ -226,10 +226,18 @@ export default class SearchAiResponseGenerateService {
         ${JSON.stringify(urlContents)}
 
         Ensure that each piece of information in the report is referenced by a number link references ex: e.g.,
-        [1] (https://exemple.com).
+        [1](https://exemple.com) associating correctly with the reference url number in the reference section.
+        Citations should be clickable markdown links: [1], [2], etc.
+        Only use information from the provided sources.
 
-        In the end have a references section where each numbered reference is followed by the corresponding URL, formatted naturally in markdown ex: ([3](https://www.example.org/careers/software-developer/))
-        THIS STEP IS VERY IMPORTANT 
+        References:
+        - End with a "References" section
+        - List all sources in numerical order
+        - Format each reference as:
+          1. [Source Name] [Article Title](URL)
+          2. [Source Name] [Article Title](URL)
+          ...
+          only the fonts used.
       `;
 
     let urlContentString = "";

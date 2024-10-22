@@ -1,4 +1,4 @@
-import { IUserSearch, ISearchRepository } from "../types/search";
+import { IUserSearch, ISearchRepository, IQueries, IQueriesPagination } from "../types/search";
 import { db } from "../database/knex";
 
 export default class SearchRepository implements ISearchRepository {
@@ -11,7 +11,7 @@ export default class SearchRepository implements ISearchRepository {
         query: search.query,
         result: search.result,
       })
-      .returning("*");
+      .returning(['id', 'query']);
     return newSearch[0];
   }
 
@@ -22,14 +22,37 @@ export default class SearchRepository implements ISearchRepository {
   }
 
   public async getAllSearchsByUserId(
-    user_id: string
-  ): Promise<Array<IUserSearch>> {
-    const searchs = await db("user_searchs")
-      .select("id", "user_id", "query", "result")
-      .where({ user_id })
-      .orderBy("created_at", "desc");
+    data: IQueries
+  ): Promise<IQueriesPagination> {
 
-    return searchs;
+    const { user_id, limit, offset, filterBy } = data;
+    
+    let query = db("user_searchs")
+      .where({ user_id })
+      .orderBy("created_at", "desc")
+    
+    if (filterBy !== undefined) {
+      query = query.where(builder => {
+        builder.where('query', 'like', `%${filterBy}%`)
+          .orWhere('result', 'like', `%${filterBy}%`);
+      });
+    }
+      
+    const pageNumbers = Math.ceil((await query).length / Number(limit));
+
+    let dynamicOffset = offset
+    if(filterBy) dynamicOffset = 0;
+    
+    query
+      .limit(limit)
+      .offset(dynamicOffset);
+        
+    const searches = await query;
+    
+    return {
+      searches,
+      pageNumbers
+    };
   }
 
   public async deleteSearchById(id: string): Promise<IUserSearch | undefined> {
@@ -46,7 +69,7 @@ export default class SearchRepository implements ISearchRepository {
       .select("id", "query", "created_at")
       .where({ user_id })
       .orderBy("created_at", "desc")
-      .limit(5);
+      .limit(6);
 
     return searchs;
   } 
