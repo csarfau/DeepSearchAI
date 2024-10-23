@@ -12,7 +12,7 @@ interface IGoogleResponse {
     error?: any
 }
 
-const baseUrl = 'http://localhost:5000/api';
+const baseUrl = 'https://alpha05.alphaedtech.org.br/api';
 
 export interface ITheme {
     id: string,

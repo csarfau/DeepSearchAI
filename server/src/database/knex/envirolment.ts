@@ -22,10 +22,10 @@ export const production: Knex.Config = {
   client: "pg",
   useNullAsDefault: true,
   connection: {
-    host: process.env.PROD_DB_HOST,
-    user: process.env.PROD_DB_USER,
-    password: process.env.PROD_DB_PWD,
-    database: process.env.PROD_DB_NAME,
+    host: "postgres",
+    user: "postgres",
+    password: "admin",
+    database: "deepsearchdb",
   },
   migrations: {
     directory: path.resolve(__dirname, "..", "migrations"),
