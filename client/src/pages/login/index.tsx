@@ -196,7 +196,9 @@ const LoginPage = () => {
       const response = await nonAuthClient.registerUser(registerEmail, registerPassword); 
       
       if (response.error) return showToast(response.error, 'error');
-
+      console.log(response);
+      
+      setToken(response.data.token as string);
       setIsFinishedRegister(true);
 
       setTimeout(() => {

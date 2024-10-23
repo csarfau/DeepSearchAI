@@ -157,9 +157,7 @@ export const createApiClient = (authOptions: AuthOptions) => {
 
                     if (done) return;
                     
-
                     const stringDecoded = decoder.decode(value);
-                    console.log(stringDecoded);
                     
                     const jsonObjects = stringDecoded.split(/(?<=\})\s*(?=\{)/);
 
