@@ -12,7 +12,7 @@ interface IGoogleResponse {
     error?: any
 }
 
-const baseUrl = 'https://alpha05.alphaedtech.org.br/api';
+const baseUrl = import.meta.env.VITE_APP_API_URL || 'http://localhost:3000/api';
 
 export interface ITheme {
     id: string,
