@@ -1,5 +1,5 @@
 import { Grid2 as Grid } from '@mui/material';
-import { Button, Container, Paper, Typography } from '@mui/material';
+import { Button, Paper, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
@@ -8,15 +8,17 @@ import {  OptionThemeCard, SkeletonThemeCard } from './partial';
 import { iconsPath } from '../components/Icons'
 import  useToast  from '../../hooks/useToast';
 import { useUser } from '../../hooks/useUser';
+import { useNavigate } from 'react-router-dom';
 
 const SuggestionPage = () => {
     const theme = useTheme();
     const [themesSuggestions, setThemesSuggestions] = useState<Array<ITheme>>([]);
     const [loading, setLoading] = useState(true);
     const [themeDefinition, setThemeDefinition] = useState<Array<string>>([]); 
-    const [isFinishedDefinition, setIsFinishedDefinition] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const showToast = useToast();
     const { user, token, isLoading: isUserLoading} = useUser();
+    const navigate = useNavigate();
 
     const handleThemeChoice = (newThemeID:string) => {
         setThemeDefinition(prev => prev.includes(newThemeID) ? prev.filter(themeID => themeID !== newThemeID) :  [...prev, newThemeID]);
@@ -26,9 +28,9 @@ const SuggestionPage = () => {
         if (user && token) {
             const apiClient = createApiClient({ token, userId: user.id });
             const response = await apiClient.saveUserThemes(selectedThemes);
-
             if(response.error) return showToast(response.error);
-            setIsFinishedDefinition(true);
+            
+            navigate('/chat');
         }
     };
 
@@ -40,27 +42,32 @@ const SuggestionPage = () => {
                 const response = await apiClient.fetchThemes();
                 
                 if (response.error) return showToast(response.error);
-                
-                setLoading(false);
                 setThemesSuggestions(response.data);
+                setLoading(false);
             }
-
+            
             return 
         };
+        
+        setTimeout(() => {
+            setIsVisible(true);
+        }, 100);
 
         loadThemes();
     }, [user, token, isUserLoading]);
         
     return (
-        <Container sx={{
-            px: 0,
-            transition: 'transform 0.8s ease-in-out', 
-            ...(isFinishedDefinition && {
-                transform: 'translateX(-120%)'
-            })
+        <Box sx={{
+                px: 0,
+                width: '100%',
+                transition: 'transform 1s ease-in-out', 
+                transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
+                display: 'flex',
+                justifyContent: 'center'
             }}>
             <Paper elevation={2} sx={{
                 minHeight: '95vh',
+                width: '90%',
                 boxSizing: 'border-box',
                 display: 'flex',
                 justifyContent: 'center',
@@ -69,7 +76,8 @@ const SuggestionPage = () => {
                 alignItems: 'center',
                 py: '2rem',
                 backgroundColor: theme.palette.secondary.main,
-                border: theme.borders.secondary
+                border: theme.borders.secondary,
+                
             }}>
                 <Box sx={{textAlign: 'center'}}>
                     <Typography variant='h4'>
@@ -102,7 +110,7 @@ const SuggestionPage = () => {
                 </Grid>
                 <Button onClick={() => handleSaveThemes(themeDefinition)} sx={{ width: { xs: '70%', sm: '15rem' }}} size='medium' variant='contained'>Confirm</Button>
             </Paper>
-        </Container>
+        </Box>
     )
 }
 
