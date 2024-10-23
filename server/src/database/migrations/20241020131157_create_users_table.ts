@@ -11,6 +11,7 @@ export async function up(knex: Knex) {
       .index('idx_users_email');
     table.string('password', 255).nullable();
     table.string('google_id').nullable();
+    table.boolean('defined_theme').defaultTo(false).notNullable();
     table.timestamps(true, true);
   })
 }

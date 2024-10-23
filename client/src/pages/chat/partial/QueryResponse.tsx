@@ -7,6 +7,8 @@ import { createApiClient, ResponseStreamType } from '../../../api/fetch';
 import { useUser } from '../../../hooks/useUser';
 import StepperContainer from './StepperContainer';
 import ErrorAlert from './ErrorAlert';
+import { useQuery, IQuerySideBar } from '../../../hooks/useQuery';
+
 
 declare module "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus" {
     const style: { [key: string]: React.CSSProperties };
@@ -18,7 +20,7 @@ interface EnhancedQueryResponseProps {
 }
 
 const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, closeResponseAreaSetter }) => {
-
+    const { addQuery } = useQuery();
     const [searchResults, setSearchResults] = useState<{
             type: ResponseStreamType;
             content: string;
@@ -47,16 +49,38 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
             content: ''
         });
     
-        try {
-            await apiClient.streamingSearch(query, (response) => {
-            setSearchResults(prev => ({
-                type: response.type,
-                content: prev.content + (response.content || '')
-            }));
+        
+        await apiClient.streamingSearch(query, (response) => {
+
             
-            if (response.type === 'error') setResponseError(response.message as string)
-            if (response.type !== 'content') setCurrentStep(response.type);
-            
+        switch (response.type) {
+                case 'content':
+                    setSearchResults(prev => ({
+                        type: response.type,
+                        content: prev.content + response.content
+                    }));
+                    break;
+                case 'error':
+                    setResponseError(response.message as string);
+                    break;
+                case 'store':                        
+                    const newQueryData = response.content as unknown
+                    addQuery(newQueryData as IQuerySideBar);
+                    break;
+                case 'done':
+                    setSearchResults(prev => ({
+                        type: response.type,
+                        content: prev.content
+                    }));
+                    break;
+                default:
+                    setCurrentStep(response.type);
+                    setSearchResults(prev => ({
+                        type: response.type,
+                        content: prev.content + (response.content || '')
+                    }));
+                    break;
+                }
         });
         
         }
@@ -134,7 +158,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                             margin: '0 auto'  
                         }}
                     >
-                        {searchResults.type === 'store' &&
+                        {searchResults.type === 'done' &&
                             <Button variant='text' onClick={() => {
                                 closeResponseAreaSetter(false);
                             }}>
@@ -160,14 +184,14 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                                         </code>
                                     );
                                 },
-                                a: ({node, id, ...props}) => (
+                                a: ({ ...props}) => (
                                     <a target="_blank" rel="noopener noreferrer" {...props} />
                                 )
                             }}
                         >
                             { searchResults.content }
                         </ReactMarkdown>
-                        {searchResults.type === 'store' &&
+                        {searchResults.type === 'done' &&
                             <Button variant='text' onClick={() => closeResponseAreaSetter(false)}>New query</Button>
 
                         }

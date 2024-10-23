@@ -1,47 +1,38 @@
-import { Box, Button, CircularProgress, List, ListItem, ListItemIcon, ListItemText, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { memo } from 'react';
+import { Box, Button, CircularProgress, List, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import { useNavigate } from "react-router-dom";
+import  { IQuerySideBar } from "../../hooks/useQuery"
 
-
-interface IQueries {
-    id: string,
-    query: string,
-    create_at: string
-    handleClick: () => void
-}
 
 export interface IQueryList {
     isLoading: boolean,
-    queryLIst: Array<IQueries>
+    queryList: Array<IQuerySideBar>,
+    isEmpty: boolean
 }
 
-const QueryList:React.FC<IQueryList> = ({queryLIst, isLoading}) => {
+const QueryList:React.FC<IQueryList> = ({ queryList, isLoading, isEmpty }) => {
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate();
-
     
     return (
         <Box sx={{ overflowY: 'hidden'}}>
             <ListItem
-            sx={{ 
-                borderRadius: '8px',
-                '&:hover': {
-                backgroundColor: theme.palette.action.hover,
-                },
-                cursor: 'pointer',
-                px: isSmallScreen ? 3 : 1,
-            }}
-            >
-            <ListItemIcon sx={{minWidth: '2rem'}}>
-                <LibraryBooksIcon sx={{color: theme.palette.secondary.main, width: '1.2rem'}} />
-            </ListItemIcon>
-            <ListItemText 
-                primary={'Query History'} 
-                sx={{color: theme.palette.secondary.main}}
-            />
+                
+                sx={{ 
+                    borderRadius: '8px',
+                    '&:hover': {
+                    backgroundColor: 'transparent',
+                    }
+                }}                        
+                >
+                <ListItemIcon sx={{minWidth: '2rem'}}>
+                    <LibraryBooksIcon sx={{color: theme.palette.secondary.main, width: '1.2rem'}} />
+                </ListItemIcon>
+                <ListItemText 
+                    primary={'Query History'} 
+                    sx={{color: theme.palette.secondary.main}}
+                />
             </ListItem>
             <List 
                 sx={{
@@ -54,16 +45,24 @@ const QueryList:React.FC<IQueryList> = ({queryLIst, isLoading}) => {
 
                 }}
             >
-            {isLoading ? (
+            {isLoading && isEmpty ? (
                 <ListItem>
                     <CircularProgress size={24} />
-                    <Typography variant="body2" sx={{ ml: 2 }}>Loading queries...</Typography>
                 </ListItem>
-            ) : queryLIst.length > 0 ? (
-                queryLIst.map((queryData, index) => (
+            ) : queryList.length === 0 ? (
+                <ListItem sx={{
+                    px: 1,
+                    py: 0,
+                    borderLeft: '1px solid #bdbdbd'
+                }}> 
+                    <Typography variant="subtitle2" color={theme.palette.secondary.main}>No recent queries found</Typography>
+                </ListItem>
+                
+            ) : (
+                queryList.map((queryData, index) => (
                     index < 5 ? (
                         <ListItem key={index} 
-                            onClick={() => navigate(`/querie/${queryData.id}`)}
+                            onClick={() => navigate(`/querie/${queryData.id}`, { state: { from: window.location.pathname } })}
                             sx={{ 
                                 px: 1,
                                 py: 0,
@@ -81,7 +80,7 @@ const QueryList:React.FC<IQueryList> = ({queryLIst, isLoading}) => {
                                     fontSize: '0.9rem',
                                     sx: { 
                                     color: theme.palette.secondary.main,
-                                    maxWidth: '200px',
+                                    maxWidth: '11rem',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                 }
@@ -103,16 +102,10 @@ const QueryList:React.FC<IQueryList> = ({queryLIst, isLoading}) => {
                         </Button>
                     )
                 ))
-            ) : (
-                <ListItem>
-                    <Typography variant="body2" color="text.secondary">No recent queries found</Typography>
-                </ListItem>
             )}
             </List>
         </Box>
     )
 };
 
-const MemoizedQueryList = memo(QueryList);
-
-export default MemoizedQueryList;
+export default QueryList;

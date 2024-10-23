@@ -9,6 +9,7 @@ declare module "knex/types/tables" {
         password?: string;
         google_id?: string;
         created_at: Date;
+        defined_theme: boolean
     }
 
     interface Theme {
