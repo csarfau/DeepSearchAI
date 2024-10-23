@@ -158,7 +158,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                             margin: '0 auto'  
                         }}
                     >
-                        {searchResults.type === 'store' &&
+                        {searchResults.type === 'done' &&
                             <Button variant='text' onClick={() => {
                                 closeResponseAreaSetter(false);
                             }}>
@@ -191,7 +191,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                         >
                             { searchResults.content }
                         </ReactMarkdown>
-                        {searchResults.type === 'store' &&
+                        {searchResults.type === 'done' &&
                             <Button variant='text' onClick={() => closeResponseAreaSetter(false)}>New query</Button>
 
                         }

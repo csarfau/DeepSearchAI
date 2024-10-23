@@ -47,7 +47,6 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                 <List subheader={
                     <ListSubheader sx={{
                         bgcolor: 'inherit', 
-                        // height: '100%',
                         color: theme.palette.secondary.main,
                         fontSize: '1.2rem',
                         display: 'flex',
@@ -77,7 +76,11 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                                 primary={'Home'} 
                         />
                     </ListItemButton>
-                    <ListItemButton >
+                    <ListItemButton 
+                        onClick={() => navigate('/profile', {
+                            replace: true,
+                        })}
+                    >
                         <ListItemIcon sx={{minWidth: '2rem'}} >
                             <Person sx={{color: theme.palette.secondary.main, width: '1.2rem'}} />
                         </ListItemIcon>

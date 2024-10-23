@@ -92,7 +92,7 @@ const QueryHistoryAll = () => {
                 justifyContent: 'space-between',
                 alignItems: 'start',
                 }}>
-                <Box sx={{ display: 'flex', gap: '0.5rem'}}>
+                <Box sx={{ display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
                     <LibraryBooksIcon sx={{color: theme.palette.text.primary, width: '1.2rem', justifySelf: 'start'}} />
                     <Typography 
                         variant="h5"

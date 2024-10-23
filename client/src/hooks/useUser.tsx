@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 interface IUser {
     id: string;
     email: string;
+    definedTheme?: boolean
 }
 
 interface IUserContext {
