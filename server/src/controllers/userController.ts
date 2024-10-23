@@ -146,16 +146,31 @@ export default class UserController {
   }
 
   public async saveThemeSuggestions(req: Request, res: Response) {
+    const { id = ''} = new RequestParamValidator(req.params).uuid().validate();
+    const usersThemes: string[] = req.body.usersThemes;
+
+    const themes = await userRepository.getThemes();
+
+    const invalidThemes = usersThemes.filter(theme => 
+      !themes.some(item => item.id === theme)
+    );
+
+    if (invalidThemes.length > 0) {
+      throw new CustomError(409, 'Invalid theme Id(s).');
+    }
+
     return res.status(201).json({
       data: await userRepository.insertUsersTheme(
-        req.params.id,
+        id,
         req.body.usersThemes
       ),
     });
   }
 
   public async getUsersSuggestions(req: Request, res: Response) {
-    const themesNames = await userRepository.getUsersThemes(req.params.id);
+    const { id = '' } = new RequestParamValidator(req.params).uuid().validate();
+
+    const themesNames = await userRepository.getUsersThemes(id);
     const suggestions = await suggestionService.generatePrompt(themesNames, 6);
     return res.status(200).json({
       data: suggestions,
@@ -170,7 +185,9 @@ export default class UserController {
   }
 
   public async getUsersPagesSuggetions(req: Request, res: Response) {
-    const themesNames = await userRepository.getUsersThemes(req.params.id);
+    const { id = '' } = new RequestParamValidator(req.params).uuid().validate();
+
+    const themesNames = await userRepository.getUsersThemes(id);
     const pageData = await suggestionService.generatePagesSuggestions(
       themesNames
     );
@@ -186,7 +203,7 @@ export default class UserController {
   }
 
   public async resetPassword(req: Request, res: Response) {
-    const { password } = req.body;
+    const { password = ''} = new RequestBodyValidator(req.body).password().validate();
     const token = req.headers.authorization?.split(" ")[1] as string;
     const hashedPassword = await bcrypt.hash(password, 10);
     const authenticatedUser = verifyToken(token);
