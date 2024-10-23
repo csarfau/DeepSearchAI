@@ -11,6 +11,7 @@ import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import SearchInput from "./partial/SearchInput";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
+import NotFound from "../components/NotFound";
 
 export interface IQueries {
     id?: string;
@@ -66,8 +67,8 @@ const QueryHistoryAll = () => {
     return (
         <Box sx={{
             width: '100%',
-            alignSelf: 'start', 
-            overflowY: 'auto', 
+            minHeight: '100%', 
+            overflow: 'auto', 
             boxSizing: 'border-box',
             position: 'relative',
             '&::-webkit-scrollbar': {
@@ -90,13 +91,9 @@ const QueryHistoryAll = () => {
                 margin: '0 auto ',
                 justifyContent: 'space-between',
                 alignItems: 'start',
-                position: 'absolute',
-                top: '1.5rem', 
-                left: '50%',
-                transform: 'translateX(-50%)'
                 }}>
                 <Box sx={{ display: 'flex', gap: '0.5rem'}}>
-                    <LibraryBooksIcon sx={{color: theme.palette.text.primary, width: '1.2rem', alignSelf: 'center'}} />
+                    <LibraryBooksIcon sx={{color: theme.palette.text.primary, width: '1.2rem', justifySelf: 'start'}} />
                     <Typography 
                         variant="h5"
                         sx={{
@@ -157,7 +154,7 @@ const QueryHistoryAll = () => {
                             >
                                 <TimeAgo createdAt={String(query.created_at)} />
                                 <Tooltip title="See more" sx={{ padding: '0' }}>
-                                    <IconButton onClick={() => navigate(`/querie/${query.id}`)}>
+                                    <IconButton onClick={() => navigate(`/querie/${query.id}`, { state: { from: window.location.pathname } })}>
                                         <OpenInNewIcon 
                                             sx={{
                                                 width: '1.2rem', 
@@ -180,12 +177,7 @@ const QueryHistoryAll = () => {
                 
             }
             {allQueries.length === 0 &&
-                <Box sx={{ 
-                        overflow: 'hidden',
-                        height: '40rem',
-                        padding: { xs: '1rem 1rem', md: '1rem 0' },                                  
-                    }} 
-                ></Box>
+                <NotFound message="We couldn't find any items that match your filter."/>
             }
 
             {pageNumbers > 1 && (

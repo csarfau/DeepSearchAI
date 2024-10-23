@@ -53,7 +53,7 @@ export default class SuggestionGenerationService {
                     Example Output:
                     {
                         "cooking": "2024's best vegan recipes",
-                        "travel": "hidden gems in South America",
+                        "trip": "hidden gems in South America",
                         "art": "modern art movements of 2024",
                         "technology": "AI breakthroughs in medical research",
                         "trip": "eco-friendly travel destinations 2024",
@@ -62,7 +62,7 @@ export default class SuggestionGenerationService {
                         "sport": "emerging sports leagues to watch",
                         "music": "best underground artists of 2024",
                         "cooking": "quick meal prep ideas for busy nights",
-                        "travel": "ultimate guide to solo travel",
+                        "trip": "ultimate guide to solo travel",
                         "art": "top art festivals to visit this year",
                         "technology": "future of quantum computing",
                         "trip": "best scenic drives in Europe",
@@ -71,7 +71,7 @@ export default class SuggestionGenerationService {
                         "sport": "best athletes to watch in 2024",
                         "music": "influential albums of the decade",
                         "cooking": "healthy meal plans for beginners",
-                        "travel": "unique cultural experiences around the world",
+                        "trip": "unique cultural experiences around the world",
                         "art": "impact of digital art on traditional media",
                         "technology": "how 5G will change communication",
                         "trip": "affordable travel hacks for families",

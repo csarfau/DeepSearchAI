@@ -23,8 +23,13 @@ export default class UserController {
             password: await bcrypt.hash(password, 10)
         }
 
+        const newUser = await userRepository.createUser(user);
+
+        const token = createToken({ id: newUser.id as string, email: newUser.email as string}, { expiresIn: "1d" });
         return res.status(201).json({
-            data: await userRepository.createUser(user)
+            data: { 
+                token
+            }
         });
     }
 
@@ -92,6 +97,8 @@ export default class UserController {
 
     public async getUsersSuggestions(req: Request, res: Response) {
         const themesNames = await userRepository.getUsersThemes(req.params.id);
+        console.log(themesNames);
+        
         const suggestions = await suggestionService.generatePrompt(themesNames, 6);
         return res.status(200).json({
             data: suggestions 

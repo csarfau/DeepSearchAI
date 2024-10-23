@@ -6,44 +6,43 @@ import { useEffect, useState } from "react"
 import useToast from "../../hooks/useToast"
 import { createApiClient } from "../../api/fetch"
 import { Outlet } from "react-router-dom"
+import { IQuerySideBar, useQuery } from "../../hooks/useQuery"
 
-interface IQueries {
-    id: string,
-    query: string,
-    create_at: string
-    handleClick: () => void
+interface ApiResponse {
+    error?: string;
+    data: Array<IQuerySideBar>;
 }
-
 
 const AuthenticatedLayout = () => {
 
     const showToast = useToast();
-    const [queries, setQueries] = useState<Array<IQueries>>([]);
     const { isLoading: isUserLoading, user, token } = useUser();
-    const [ isLoading, setIsLoading ] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmptyHistory, setIsEmptyHistory] = useState(false);
+    const { queries, updateAllList } = useQuery();
 
     const getRecentQueries = async () => {
-
         if (!isUserLoading && user && token) {
-
-
             const apiClient = createApiClient({ token, userId: user.id });
-            const response = await apiClient.getLatestQueries();
+            const response = await apiClient.getLatestQueries() as ApiResponse;
             
-            if (response.error) return showToast(response.error);
-
-            setQueries(response.data);
+            if (response.error) {
+                showToast(response.error);
+                return;
+            }
+            
+            updateAllList(response.data);
+            setIsEmptyHistory(response.data.length === 0);
             setIsLoading(false);
         }
     };
-    
+
     useEffect(() => {
         getRecentQueries();
-    }, [isUserLoading]);
-
+    }, [isUserLoading, user, token]);
         
     return (
-        <>
+        <>           
             <Box sx={{
                     width: '100%',
                     px: {
@@ -53,16 +52,16 @@ const AuthenticatedLayout = () => {
                         lg: '1rem'
                     },
                     boxSizing: 'border-box',
-                    height: '100vh',
+                    minHeight: '100vh',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     background: '#64447e',
                 }}>
-                <SideBar isLoading={isLoading} queryLIst={queries}/>
+                <SideBar isLoading={isLoading} queryList={queries} isEmpty={isEmptyHistory}/>
                 <Paper elevation={2} sx={{
                     width: '100%',
-                    height: { xs: '100%', md: '95%'},
+                    height: { xs: '100vh', md: '95vh'},
                     boxSizing: 'border-box',
                     display: 'flex',
                     justifyContent: 'center',
