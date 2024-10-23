@@ -21,6 +21,7 @@ const LoginPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [registerErrors, setRegisterErrors] = useState({ registerEmail: '', registerPassword: '', confirmPassword: '' });
+  const [isFinishedRegister, setIsFinishedRegister] = useState(false);
   const [modalOpen, setModalOpen] = useState(false); 
   const [loading, setLoading] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -149,7 +150,7 @@ const LoginPage = () => {
 
     try {
       const response = await nonAuthClient.login(email, password);
-
+      
       if (response.error) return showToast(response.error, 'error');
 
         setToken(response.token as string);
@@ -192,10 +193,16 @@ const LoginPage = () => {
   const handleRegister = async () => {
     if (!validateRegister()) return;
     try {
-      const response = await nonAuthClient.registerUser(registerEmail, registerPassword);
-
+      const response = await nonAuthClient.registerUser(registerEmail, registerPassword); 
+      
       if (response.error) return showToast(response.error, 'error');
 
+      setIsFinishedRegister(true);
+
+      setTimeout(() => {
+        navigate('/suggestions')
+      }, 1000)
+      
       setRegisterChoice(false);
       return showToast('Account created!', 'success');
 
@@ -212,11 +219,12 @@ const LoginPage = () => {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      overflow: 'hidden'
     }}>
       <Paper elevation={2} sx={{
+        minHeight: '95vh',
         width: '90%',
-        height: '90%',
         boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'space-between',
@@ -225,6 +233,8 @@ const LoginPage = () => {
         border: theme.borders.secondary,
         position: 'relative',
         overflow: 'hidden',
+        transition: 'transform 1s ease-in-out',
+        ...(isFinishedRegister && {transform: 'translateX(-200%)'})
       }}>
         {/* Container Login */}
         <Box sx={{ 

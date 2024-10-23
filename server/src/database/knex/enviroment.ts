@@ -1,6 +1,8 @@
 import { Knex } from "knex";
 import path from "path";
 
+import { config } from "dotenv";
+config()
 export const development: Knex.Config = {
   client: "pg",
   useNullAsDefault: true,
