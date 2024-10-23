@@ -61,7 +61,7 @@ function App() {
         <ToastContainer />
         <UserProvider>
         <QueryProvider>
-          <div className="App" style={{ overflowX: 'hidden'}}>
+          <div className="App">
             <RouterProvider router={Router} />
           </div>
         </QueryProvider>

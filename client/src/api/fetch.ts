@@ -266,6 +266,10 @@ export const createApiClient = (authOptions: AuthOptions) => {
 
         getQueryById: async (id: string): Promise<IFetchResponse> => {
             return authenticatedFetch(baseUrl + `/search/${id}`)
-        }
+        },
+        // /user/themes
+        getUsersTheme: async (): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + '/user/themes')
+        },
     };
 };

@@ -16,7 +16,7 @@ export default class UserController {
     public async createUser(req: Request, res: Response) {
         const { email, password } = req.body;
         const userExists = await userRepository.getUserByEmail(email);
-        if(userExists) throw new CustomError(400, "User already exists.");
+        if(userExists) throw new CustomError(400, "Invalid Email.");
 
         const user: IUser = {
             email,
@@ -25,10 +25,15 @@ export default class UserController {
 
         const newUser = await userRepository.createUser(user);
 
-        const token = createToken({ id: newUser.id as string, email: newUser.email as string}, { expiresIn: "1d" });
+        const token = createToken({ 
+            id: newUser.id as string, 
+            email: newUser.email as string,
+            definedTheme: newUser.defined_theme as boolean
+        }, { expiresIn: "1d" });
         return res.status(201).json({
             data: { 
-                token
+                token,
+                definedTheme: newUser.defined_theme
             }
         });
     }
@@ -51,7 +56,7 @@ export default class UserController {
             throw new CustomError(404, "E-mail not found.");
         }
 
-        await createEmailToRecoverPassword(user.id as string, email);
+        await createEmailToRecoverPassword(user.id as string, email, user.defined_theme as boolean);
         return res.status(200).json({ message: "Email delivered." })
     }
 
@@ -63,14 +68,22 @@ export default class UserController {
 
             if(!user) {
                 const user = await this.createGoogleUser(email, googleId);
-                const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
+                const token = createToken({ 
+                    id: user.id as string, 
+                    email,
+                    definedTheme: user.defined_theme as boolean 
+                }, { expiresIn: "1d" });
                 return res.status(201).json({ token });
             }
 
             const authGoogle = user.google_id === googleId;
             if(!authGoogle) throw new CustomError(401, "Credentials doesn't match.");
 
-            const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
+            const token = createToken({ 
+                id: user.id as string, 
+                email, 
+                definedTheme: user.defined_theme as boolean
+            }, { expiresIn: "1d" });
             return res.status(200).json({ token });
         }
         
@@ -84,7 +97,11 @@ export default class UserController {
             throw new CustomError(401, "Credentials doesn't match.");
         }
 
-        const token = createToken({ id: user.id as string, email }, { expiresIn: "1d" });
+        const token = createToken({ 
+            id: user.id as string, 
+            email,
+            definedTheme: user.defined_theme as boolean 
+        }, { expiresIn: "1d" });
 
         return res.status(200).json({ token });
     } 
@@ -96,12 +113,17 @@ export default class UserController {
     }
 
     public async getUsersSuggestions(req: Request, res: Response) {
-        const themesNames = await userRepository.getUsersThemes(req.params.id);
-        console.log(themesNames);
-        
+        const themesNames = await userRepository.getUsersThemes(req.params.id);        
         const suggestions = await suggestionService.generatePrompt(themesNames, 6);
         return res.status(200).json({
             data: suggestions 
+        })
+    }
+
+    public async getUsersThemesById(req: Request, res: Response) {
+        const usersTheme = await userRepository.getUsersThemesById(req.user?.id as string);
+        return res.status(200).json({
+            data: usersTheme
         })
     }
 

@@ -35,7 +35,9 @@ const SuggestionPage = () => {
     };
 
     useEffect(() => {
+        if (user?.definedTheme) navigate('/chat');
 
+        
         const loadThemes = async () => {
             if (!isUserLoading && user && token) {
                 const apiClient = createApiClient({ token, userId: user.id });
@@ -63,11 +65,11 @@ const SuggestionPage = () => {
                 transition: 'transform 1s ease-in-out', 
                 transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
                 display: 'flex',
-                justifyContent: 'center'
+                justifyContent: 'center',
             }}>
             <Paper elevation={2} sx={{
-                minHeight: '95vh',
-                width: '90%',
+                minHeight: {md: '95vh'},
+                width:{ xs: '100%', md: '90%'},
                 boxSizing: 'border-box',
                 display: 'flex',
                 justifyContent: 'center',
