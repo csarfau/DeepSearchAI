@@ -14,7 +14,7 @@ abstract class BaseRequestValidate<T>{
 }
 
 export class RequestBodyValidator extends BaseRequestValidate<IRequestBody>{
-  private readonly emailRegex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
+  private readonly emailRegex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i;
 
   public email(): this {
     const email = this.data.email;
