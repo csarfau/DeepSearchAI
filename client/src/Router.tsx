@@ -1,9 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import LoginPage from "./pages/login";
 import SuggestionPage from "./pages/suggestion/index";
-import ChatPage from "./pages/chat/index";
-import ForYouPage from "./pages/forYou";
 import ResetPassword from "./pages/resetPass/resetPassword";
+import QueryHistoryAll from "./pages/queryHistory";
+import IndividualQuery from "./pages/individualQuery";
+import AuthenticatedLayout from "./pages/layout";
+import ChatPage from "./pages/chat";
+
 
 const Router = createBrowserRouter([
     {
@@ -15,18 +18,26 @@ const Router = createBrowserRouter([
         element: <SuggestionPage />,
     },
     {
-        path: "/chat",
-        element: <ChatPage />,
-    },
-    {
-        path: "/foryou",
-        element: <ForYouPage />,
-    },
-    {
         path: "/reset-password/:token",
         element: <ResetPassword />,
     },
-    
+    {
+        element: <AuthenticatedLayout />,
+        children: [
+          {
+            path: "/chat",
+            element: <ChatPage />
+          },
+          {
+            path: "/queries",
+            element: <QueryHistoryAll />
+          },
+          {
+            path: "/querie/:id",
+            element: <IndividualQuery />
+          }
+        ]
+    }
 ]);
 
 export default Router;
