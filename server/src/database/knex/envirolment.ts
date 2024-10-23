@@ -1,15 +1,13 @@
 import { Knex } from "knex";
 import path from "path";
+import { config } from "dotenv";
+
+config({ path: path.join(__dirname, "../../../.env") });
 
 export const development: Knex.Config = {
   client: "pg",
   useNullAsDefault: true,
-  connection: {
-    host: "localhost",
-    user: "postgres",
-    password: "admin",
-    database: "DeepSearchAI",
-  },
+  connection: process.env.DB_URL,
   migrations: {
     directory: path.resolve(__dirname, "..", "migrations"),
   },
@@ -21,12 +19,7 @@ export const development: Knex.Config = {
 export const production: Knex.Config = {
   client: "pg",
   useNullAsDefault: true,
-  connection: {
-    host: "postgres",
-    user: "postgres",
-    password: "admin",
-    database: "deepsearchdb",
-  },
+  connection: process.env.PROD_DB_URL,
   migrations: {
     directory: path.resolve(__dirname, "..", "migrations"),
   },
