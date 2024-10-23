@@ -80,6 +80,7 @@ export default class SearchAiResponseGenerateService {
 
       const extractor = new TavilyContentExtractor(filteredList);
       const data = await extractor.extractAll();
+
       yield { type: "thirdStep", content: "" };
 
       const finalPrompt = this.formatAiUserRequestPrompt(query, data.results);
@@ -98,6 +99,7 @@ export default class SearchAiResponseGenerateService {
         if (typeof chunk.response !== "string") {
           continue;
         }
+        
         yield {
           type: "content",
           content: chunk.response.slice(lastChunk.length),
@@ -107,7 +109,7 @@ export default class SearchAiResponseGenerateService {
 
       yield { type: "done", content: "" };
     } catch (error) {
-      throw error;
+      yield { type: "error", message: 'Error in process the data, try again with another prompt format.' };
     }
   }
 
@@ -213,10 +215,6 @@ export default class SearchAiResponseGenerateService {
         Based on the following query: "${userQuery}" and the content from various sources listed below, write a detailed,
         informative, and helpful search result report about the topic.
     
-        Ensure that each piece of information in the report is referenced by a number in brackets (e.g., [1], [2], etc.), and at the end of the report, include a references list with the corresponding URLs (in the format [1]: <URL>, [2]: <URL>, etc.).
-    
-        Do not call it a "report", but a "search result" and write it as such.
-    
         REMEMBER: FOR EACH PIECE OF INFORMATION, REFERENCE THE SOURCE BY THE CORRESPONDING NUMBER.
         MAKE SURE NOT TO MAKE UP OR USE INFORMATION YOU IMPLICITLY KNOW, INSTEAD ONLY GET INFORMATION FROM THE SOURCES.
         ALL INFORMATION IN THE REPORT MUST HAVE A REFERENCE TO THE SOURCE.
@@ -226,6 +224,20 @@ export default class SearchAiResponseGenerateService {
         Here is the content from the different sources:
     
         ${JSON.stringify(urlContents)}
+
+        Ensure that each piece of information in the report is referenced by a number link references ex: e.g.,
+        [1](https://exemple.com) associating correctly with the reference url number in the reference section.
+        Citations should be clickable markdown links: [1], [2], etc.
+        Only use information from the provided sources.
+
+        References:
+        - End with a "References" section
+        - List all sources in numerical order
+        - Format each reference as:
+          1. [Source Name] [Article Title](URL)
+          2. [Source Name] [Article Title](URL)
+          ...
+          only the fonts used.
       `;
 
     let urlContentString = "";
