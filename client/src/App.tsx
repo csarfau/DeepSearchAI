@@ -59,7 +59,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <ToastContainer />
         <UserProvider>
-          <div className="App">
+          <div className="App" style={{ overflowX: 'hidden'}}>
             <RouterProvider router={Router} />
           </div>
         </UserProvider>
