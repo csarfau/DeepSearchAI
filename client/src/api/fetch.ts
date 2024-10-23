@@ -58,6 +58,8 @@ const createAuthenticatedFetch = (authOptions: AuthOptions) => {
     };
 };
 
+export type ResponseStreamType = 'init' | 'firstStep' | 'secondStep' | 'thirdStep' | 'content' | 'done' | 'error' | 'message' | 'store';
+
 export const createApiClient = (authOptions: AuthOptions) => {
     
     const authenticatedFetch = createAuthenticatedFetch(authOptions);
@@ -122,6 +124,62 @@ export const createApiClient = (authOptions: AuthOptions) => {
             return authenticatedFetch(baseUrl + `/user/${authOptions.userId}/suggestions`);
         },
 
+        streamingSearch: async (
+            query: string,
+            onContent: (
+                content: {
+                    type: ResponseStreamType, 
+                    content?: string,
+                    message?: string
+                }
+            ) => void
+        ): Promise<void | { error: any }> => {
+
+            try {
+                const response = await fetch(`${baseUrl}/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authOptions.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query }),
+                });
+
+                if (!response.body) {
+                    throw new Error('No response body');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                const read = async (): Promise<void> => {
+                    const { done, value } = await reader.read();
+
+                    if (done) return;
+                    
+
+                    const stringDecoded = decoder.decode(value);
+                    console.log(stringDecoded);
+                    
+                    const jsonObjects = stringDecoded.split(/(?<=\})\s*(?=\{)/);
+
+                    jsonObjects.forEach(jsonString => {
+                        try {
+                            onContent(JSON.parse(jsonString));                            
+                        } catch (error: any) {
+                            return { error: error.message };
+                        }
+                    });
+
+                    await read();
+                };
+
+                await read();
+            } catch (error: any) {
+                return { error: error.message };
+            }
+        },
+    
         sendForgotPasswordEmail: async (email: string): Promise<IFetchResponse> => {
             try {
                 const response = await fetch(`${baseUrl}/user/recovery-pass`, {
@@ -194,7 +252,22 @@ export const createApiClient = (authOptions: AuthOptions) => {
                 console.error('Error fetching Google user info:', error);
                 return { error: error.message || 'An unexpected error occurred' };
             }
-        }
+        },
 
+        getLatestQueries: async (): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/searches/latest`);
+        },
+
+        getAllQueries: async(limit: number, offset:number, filterBy?: string): Promise<IFetchResponse> => {
+            const url = filterBy  ?
+                `/searches?limit=${limit}&offset=${offset}&filterBy=${filterBy}`
+                : 
+                `/searches?limit=${limit}&offset=${offset}`
+            return authenticatedFetch(baseUrl + url)
+        },
+
+        getQueryById: async (id: string): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/search/${id}`)
+        }
     };
 };
