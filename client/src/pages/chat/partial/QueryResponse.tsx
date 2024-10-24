@@ -40,14 +40,10 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                 token,
                 userId: user?.id
             });
-
-            
         setSearchResults({
             type: 'firstStep',
             content: ''
         });
-    
-        try {
             await apiClient.streamingSearch(query, (response) => {
             setSearchResults(prev => ({
                 type: response.type,
@@ -58,7 +54,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
             if (response.type !== 'content') setCurrentStep(response.type);
             
         });
-        
+
         }
     }, [query, isUserLoading, user, token]);
 
