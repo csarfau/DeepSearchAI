@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Alert, AlertTitle, Box } from '@mui/material';
-import { Close as CloseIcon, ErrorOutline as ErrorIcon } from '@mui/icons-material';
+import { Close as CloseIcon,  } from '@mui/icons-material';
 import { theme } from '../../../App';
 
 interface ErrorAlertProps {
@@ -24,13 +24,12 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, closeResponseAreaSette
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center'
+                alignItems: 'center'
             }}
         >
             <Alert
-                severity="error"
-                icon={<ErrorIcon fontSize="inherit" />}
+                severity="info"
+                icon={<img style={{ width: '1.5rem' }} src='/src/assets/icons/fail-icon.svg' />}
                 action={
                     <CloseIcon
                         onClick={() => closeResponseAreaSetter(false)}
@@ -40,6 +39,9 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, closeResponseAreaSette
                 sx={{
                     maxWidth: '600px',
                     fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center', 
+                    gap: '1rem', 
                     background: theme.palette.secondary.main
                 }}
             >

@@ -23,6 +23,7 @@ export interface IUserSuggestion {
 
 
 export const SuggestionCardSkeleton: React.FC = () => {
+    
     return (
         <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
             {Array.from({ length: 4 }).map((_, index) => (

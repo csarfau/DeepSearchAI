@@ -5,6 +5,7 @@ import Router from './Router';
 import { createTheme } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
 import { UserProvider } from './hooks/useUser';
+import { QueryProvider } from './hooks/useQuery';
 
 export const theme = createTheme({
   palette: {
@@ -59,9 +60,11 @@ function App() {
       <ThemeProvider theme={theme}>
         <ToastContainer />
         <UserProvider>
-          <div className="App" style={{ overflowX: 'hidden'}}>
+        <QueryProvider>
+          <div className="App">
             <RouterProvider router={Router} />
           </div>
+        </QueryProvider>
         </UserProvider>
       </ThemeProvider>
     </>

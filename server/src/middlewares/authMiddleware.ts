@@ -15,7 +15,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
       throw new Error();
     }
 
-    req.user = { id: authenticatedUser.id, email: authenticatedUser.email }
+    req.user = { id: authenticatedUser.id, email: authenticatedUser.email, definedTheme: authenticatedUser.definedTheme }
 
     return next();
 
