@@ -31,7 +31,7 @@ const LoginPage = () => {
   const theme = useTheme();
   const showToast = useToast();
   const navigate = useNavigate();
-  const { setToken } = useUser();
+  const { setToken, user } = useUser();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowRegisterPassword = () => setShowRegisterPassword((show) => !show);
@@ -167,11 +167,15 @@ const LoginPage = () => {
       try {
         const userInfo = await nonAuthClient.userGoogleInfos(response.access_token);
         if (userInfo.error) return showToast("Google login failed. Please try again.", "error");
+
         const emptyPassword = '';
         const loginResponse = await nonAuthClient.login(userInfo.email as string, emptyPassword, userInfo.sub as string);
         if (loginResponse.error) return showToast("Google login failed. PLease try again.", "error");
 
         setToken(loginResponse.token as string);
+
+        if (!user?.definedTheme) return navigate('/suggestions');
+
         navigate('/chat');
       } catch (error) {
         return showToast(error as string, 'error');
@@ -199,6 +203,7 @@ const LoginPage = () => {
       
       if (response.error) return showToast(response.error, 'error');
 
+      setToken(response.data.token as string);
       setIsFinishedRegister(true);
 
       setTimeout(() => {
@@ -214,7 +219,7 @@ const LoginPage = () => {
   };
 
   return (
-    <Box sx={{
+    <Box  sx={{
       width: '100%',
       px: '2rem',
       height: '100vh',
@@ -231,7 +236,6 @@ const LoginPage = () => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: theme.palette.secondary.main,
         border: theme.borders.secondary,
         position: 'relative',
         overflow: 'hidden',
@@ -240,8 +244,11 @@ const LoginPage = () => {
       }}>
         {/* Container Login */}
         <Box sx={{ 
-          width: '50%',
-          display: 'flex', 
+          width: { 
+            xs: '100%', 
+            lg: '50%'
+          },
+          display: !registerChoice ? 'flex' : { sx: 'none', lg: 'flex' },
           flexDirection: 'column', 
           alignItems: 'center',
           gap: '2rem',
@@ -409,7 +416,7 @@ const LoginPage = () => {
           </Box>
         </Box>
 
-
+        
         {/* Container Image */}
         <Box sx={{
             zIndex: 30,
@@ -418,21 +425,59 @@ const LoginPage = () => {
             left: registerChoice ? 0 : '50%',
             width: '50%',
             height: '100%',
-            display: 'flex',
+            boxSizing: 'border-box', 
+            p: '1.5rem',
+            display: { xs: 'none', lg: 'flex'},
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
+            flexDirection: 'column',
             transition: 'left 0.7s ease-in-out',
             overflow: 'hidden',
             backgroundImage: `url(${banner})`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center'
-        }}/>
+        }}>
+          <Typography variant="h4" 
+            sx={{ 
+              maxWidth: '15rem', 
+              boxSizing: 'border-box',
+              background: '#ffffffce', 
+              p: '1.1rem', 
+              borderRadius: '24px 8px 24px 8px', 
+              color: theme.palette.text.secondary,
+              fontWeight: '500',
+              lineHeight: '2.6rem', 
+              alignSelf: 'flex-end'
+            }}>
+            Unlock the Power of Information <span className="span-gradient-title">with AI-Driven Precision</span>
+          </Typography>
+          <Typography variant="body2" 
+            sx={{ 
+              width: "80%",
+              boxSizing: 'border-box',
+              background: '#ffffffce', 
+              p: '1.1rem', 
+              borderRadius: '24px 8px 24px 8px', 
+              color: theme.palette.text.secondary,
+              fontWeight: '600',
+              alignSelf: 'start'
+            }}>
+              {/* <span className="span-gradient-body"></span> */}
+              This innovative web application leverages AI to streamline your information searches.
+              With a sleek interface, it processes queries and <span className="span-gradient-body">delivers accurate results</span>, 
+              complete with reliable web references. 
+              Experience the power of intelligent data exploration and <span className="span-gradient-body">effortlessly uncover valuable insights</span>.
+          </Typography>
+        </Box>
             
         {/* Form register */}
         <Box sx={{ 
-              width: '50%',
-              display: 'flex', 
+              minWidth: { 
+                xs: '100%', 
+                lg: '50%', 
+              },
+              display: registerChoice ? 'flex' : { sx: 'none', lg: 'flex'} , 
               flexDirection: 'column', 
               alignItems: 'center',
               gap: '2rem',
