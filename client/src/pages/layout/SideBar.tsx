@@ -1,26 +1,29 @@
-import { useState} from 'react';
-import Box from '@mui/material/Box';
+import MemoizedQueryList, { IQueryList } from './QueryList'; 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ListSubheader from '@mui/material/ListSubheader';
-import { useTheme } from '@mui/material/styles';
-import {  Home, Person } from '@mui/icons-material';
-import { Avatar } from '@mui/material';
-import MemoizedQueryList, { IQueryList } from './QueryList'; 
-import { useNavigate } from 'react-router-dom';
 import roundLogo from "@/assets/images/round-logo.svg";
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import {  Home, Person } from '@mui/icons-material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../hooks/useUser';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import { Avatar } from '@mui/material';
+import List from '@mui/material/List';
+import Box from '@mui/material/Box';
+import { useState} from 'react';
 
 const SideBard:React.FC<IQueryList> = (queryListProps) => {
     const [open, setOpen] = useState(false);
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
     const navigate = useNavigate();
+    const { logout } = useUser();
 
     const toggleDrawer = (open: boolean) => () => {
         setOpen(open);
@@ -31,8 +34,12 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
             <Box
                 sx={{                     
                     background: '#64447e',
-                    height: '100vh',
-                    ...(isSmallScreen && {p: '2rem' })                    
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    height: '100%',
+                    justifyContent: 'space-between',
+                    flexDirection: 'column',
+                    ...(isSmallScreen && {p: '1rem' })                    
                 }}
                 role="presentation"
                 onClick={toggleDrawer(false)}
@@ -41,7 +48,6 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                 <List subheader={
                     <ListSubheader sx={{
                         bgcolor: 'inherit', 
-                        height: '100%',
                         color: theme.palette.secondary.main,
                         fontSize: '1.2rem',
                         display: 'flex',
@@ -55,10 +61,12 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                 }>
                     <Divider />
                     <ListItemButton 
-                        onClick={() => navigate('/chat')}
+                        onClick={() => navigate('/chat', {
+                            replace: true,
+                        })}
                         sx={{
-                            mt: '1rem',                        
-                            ...(isSmallScreen ? {px: '1.5rem'} : { px: '0.5rem' })}}                        
+                            mt: '1rem'
+                        }}                        
                         >
                         <ListItemIcon sx={{minWidth: '2rem'}}> 
                             <Home sx={{color: theme.palette.secondary.main, width: '1.2rem'}}/>
@@ -69,8 +77,11 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                                 primary={'Home'} 
                         />
                     </ListItemButton>
-                    <ListItemButton sx={{  
-                        ...(isSmallScreen ? {px: '1.5rem'} : { px: '0.5rem' }) }}>
+                    <ListItemButton 
+                        onClick={() => navigate('/profile', {
+                            replace: true,
+                        })}
+                    >
                         <ListItemIcon sx={{minWidth: '2rem'}} >
                             <Person sx={{color: theme.palette.secondary.main, width: '1.2rem'}} />
                         </ListItemIcon>
@@ -82,6 +93,13 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                     </ListItemButton>
                     <MemoizedQueryList {...queryListProps}/>
                 </List>
+                <Button 
+                    onClick={() => logout()}
+                    size='small' 
+                    sx={{ color: theme.palette.secondary.main, alignSelf: 'start' }} 
+                    startIcon={<LogoutIcon/>}>
+                    Logout
+                </Button>
             </Box>  
             )
     };
@@ -89,6 +107,7 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
     return (
         <Box sx={{
             overflow: 'hidden',
+            position: 'relative',
             ...(!isSmallScreen && { minWidth: '15rem' }),      
         }}>
         {!isSmallScreen && (
