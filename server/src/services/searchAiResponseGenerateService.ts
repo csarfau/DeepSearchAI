@@ -109,7 +109,7 @@ export default class SearchAiResponseGenerateService {
 
       yield { type: "done", content: "" };
     } catch (error) {
-      yield { type: "error", message: 'Error in process the data, try again with another prompt format.' };
+      yield { type: "error", message: 'Error in process the data, try again with another prompt format' };
     }
   }
 
@@ -212,7 +212,7 @@ export default class SearchAiResponseGenerateService {
     urlContents: IFilteredResultContent[]
   ): Array<{ role: "user" | "assistant" | "system"; content: string }> {
     const contentTemplate = `
-        Based on the following query: "${userQuery}" and the content from various sources listed below, write a detailed,
+         Based on the following query: "${userQuery}" and the content from various sources listed below, write a detailed,
         informative, and helpful search result report about the topic.
     
         REMEMBER: FOR EACH PIECE OF INFORMATION, REFERENCE THE SOURCE BY THE CORRESPONDING NUMBER.
@@ -225,17 +225,17 @@ export default class SearchAiResponseGenerateService {
     
         ${JSON.stringify(urlContents)}
 
-        Ensure that each piece of information in the report is referenced by a number link references ex: e.g.,
-        [1](https://exemple.com) associating correctly with the reference url number in the reference section.
-        Citations should be clickable markdown links: [1], [2], etc.
+        Ensure that each piece of information in the report is referenced by a number link references
+        associating correctly with the reference url number in the reference section.
+        Citations should be clickable markdown links, e.g: [1](https://firstsource.com), [2](https://secondsource.com), etc.
         Only use information from the provided sources.
 
         References:
         - End with a "References" section
         - List all sources in numerical order
         - Format each reference as:
-          1. [Source Name] [Article Title](URL)
-          2. [Source Name] [Article Title](URL)
+          1. [firstsource](https://firstsource.com)
+          2. [secondsource](https://secondsource.com)
           ...
           only the fonts used.
       `;
