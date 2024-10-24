@@ -21,9 +21,6 @@ const IndividualQuery:React.FC = () => {
     const previousAddress = location.state?.from;
 
     const urlParams = previousAddress.split('/')[2];
-    console.log(urlParams);
-    
-    
     const getQuery = async () => {
         if (!isLoadingUser && token && user ) {
 
