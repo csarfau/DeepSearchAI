@@ -1,15 +1,14 @@
 import React, { useState, useCallback, useEffect, useRef, ComponentPropsWithoutRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Box, Button, Theme } from '@mui/material';
 import { createApiClient, ResponseStreamType } from '../../../api/fetch';
-import { useUser } from '../../../hooks/useUser';
-import StepperContainer from './StepperContainer';
-import ErrorAlert from './ErrorAlert';
-import linkIcon from "@/assets/icons/link-icon.svg"
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { useQuery, IQuerySideBar } from '../../../hooks/useQuery';
-
+import linkIcon from "@/assets/icons/link-icon.svg";
+import { Box, Button, Theme } from '@mui/material';
+import StepperContainer from './StepperContainer';
+import { useUser } from '../../../hooks/useUser';
+import ReactMarkdown from 'react-markdown';
+import ErrorAlert from './ErrorAlert';
 
 declare module "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus" {
     const style: { [key: string]: React.CSSProperties };
