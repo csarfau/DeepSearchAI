@@ -14,6 +14,7 @@ import {  Home, Person } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
 import MemoizedQueryList from './QueryHistorySidebar';
 import { useNavigate } from 'react-router-dom';
+import roundLogo from "@/assets/images/round-logo.svg"
 
 const ResponsiveDrawer = () => {
     const [open, setOpen] = useState(false);
@@ -49,7 +50,7 @@ const ResponsiveDrawer = () => {
                         flexDirection: 'column',
                         alignItems: 'center',
                     }} component="div">
-                        <Avatar sx={{width: '1.5rem', height: '1.5rem'}} alt="logo" src="/src/assets/images/round-logo.svg"/>
+                        <Avatar sx={{width: '1.5rem', height: '1.5rem'}} alt="logo" src={roundLogo}/>
                         DeepSearchAI
                     </ListSubheader>
                 }>

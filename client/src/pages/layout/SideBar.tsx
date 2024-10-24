@@ -14,7 +14,7 @@ import {  Home, Person } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
 import MemoizedQueryList, { IQueryList } from './QueryList'; 
 import { useNavigate } from 'react-router-dom';
-
+import roundLogo from "@/assets/images/round-logo.svg";
 
 const SideBard:React.FC<IQueryList> = (queryListProps) => {
     const [open, setOpen] = useState(false);
@@ -49,7 +49,7 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                         flexDirection: 'column',
                         alignItems: 'center',
                     }} component="div">
-                        <Avatar sx={{width: '1.5rem', height: '1.5rem'}} alt="logo" src="/src/assets/images/round-logo.svg"/>
+                        <Avatar sx={{width: '1.5rem', height: '1.5rem'}} alt="logo" src={roundLogo}/>
                         DeepSearchAI
                     </ListSubheader>
                 }>

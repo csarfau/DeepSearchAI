@@ -9,7 +9,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Box, Button, Theme } from '@mui/material';
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import linkIcon from '@/assets/icons/link-icon.svg';
 
 const IndividualQuery:React.FC = () => {
     const { isLoading: isLoadingUser, user, token } = useUser();
@@ -77,7 +77,7 @@ const IndividualQuery:React.FC = () => {
                     content: "''", 
                     width: '0.8rem',
                     height: '0.8rem',
-                    backgroundImage: "url('/src/assets/icons/link-icon.svg')",
+                    backgroundImage: `url(${linkIcon})`,
                     backgroundSize: 'contain', 
                     backgroundRepeat: 'no-repeat', 
                     backgroundPosition: 'center' 
