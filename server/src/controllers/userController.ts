@@ -56,7 +56,6 @@ export default class UserController {
   }
 
   public async updateUserById(req: Request, res: Response) {
-    const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
     const { email, password } = req.body;
 
     if (password) {
@@ -65,23 +64,13 @@ export default class UserController {
       new RequestBodyValidator(req.body).email();
     }
 
-    const userToUpdate = await userRepository.getUserByID(id);
-
-    if (!userToUpdate) {
-      throw new CustomError(404, "User not found.");
-    }
-
-    if (!req.user || req.user.id !== userToUpdate.id) {
-      throw new CustomError(401, "Unauthorized Action");
-    }
-
     const usedVerify = await userRepository.getUserByEmail(email);
 
-    if (usedVerify && usedVerify.id !== userToUpdate.id) {
+    if (usedVerify && usedVerify.id !== req.user?.id) {
       throw new CustomError(409, "Invalid email.");
     }
 
-    let user: IUser = { id, email };
+    let user: IUser = { id: req.user?.id, email };
 
     if (password) {
       user.password = await bcrypt.hash(password, 10);
