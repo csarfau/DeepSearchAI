@@ -6,6 +6,7 @@ import QueryHistoryAll from "./pages/queryHistory";
 import IndividualQuery from "./pages/individualQuery";
 import AuthenticatedLayout from "./pages/layout";
 import ChatPage from "./pages/chat";
+import ProfilePage from "./pages/profile";
 
 
 const Router = createBrowserRouter([
@@ -35,6 +36,9 @@ const Router = createBrowserRouter([
           {
             path: "/querie/:id",
             element: <IndividualQuery />
+          },{
+            path: "/Profile",
+            element: <ProfilePage />
           }
         ]
     }
