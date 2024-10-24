@@ -4,7 +4,6 @@ import UserRepository from "../repositories/userRepository";
 import { IUser } from "../types/user";
 import bcrypt, { compare } from "bcrypt";
 import { createToken, verifyToken } from "../utils/token";
-import sendEmail from "../services/sendEmail";
 import createEmailToRecoverPassword from "../services/emailSenderPass";
 import { CustomError } from "../helpers/customError";
 import {
@@ -22,15 +21,28 @@ export default class UserController {
       .password()
       .validate();
     const userExists = await userRepository.getUserByEmail(email);
-    if (userExists) throw new CustomError(400, "User already exists.");
+    if (userExists) throw new CustomError(409, "Invalid Email.");
 
     const user: IUser = {
       email,
       password: await bcrypt.hash(password, 10),
     };
 
+    const newUser = await userRepository.createUser(user);
+
+    const token = createToken(
+      {
+        id: newUser.id as string,
+        email: newUser.email as string,
+        definedTheme: newUser.defined_theme as boolean,
+      },
+      { expiresIn: "1d" }
+    );
     return res.status(201).json({
-      data: await userRepository.createUser(user),
+      data: {
+        token,
+        definedTheme: newUser.defined_theme,
+      },
     });
   }
 
@@ -44,7 +56,7 @@ export default class UserController {
   }
 
   public async updateUserById(req: Request, res: Response) {
-    const { id = ''} = new RequestParamValidator(req.params).uuid().validate();
+    const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
     const { email, password } = req.body;
 
     if (password) {
@@ -91,7 +103,11 @@ export default class UserController {
       throw new CustomError(404, "E-mail not found.");
     }
 
-    await createEmailToRecoverPassword(user.id as string, email);
+    await createEmailToRecoverPassword(
+      user.id as string,
+      email,
+      user.defined_theme as boolean
+    );
     return res.status(200).json({ message: "Email delivered." });
   }
 
@@ -108,7 +124,11 @@ export default class UserController {
       if (!user) {
         const user = await this.createGoogleUser(email, googleId);
         const token = createToken(
-          { id: user.id as string, email },
+          {
+            id: user.id as string,
+            email,
+            definedTheme: user.defined_theme as boolean,
+          },
           { expiresIn: "1d" }
         );
         return res.status(201).json({ token });
@@ -118,7 +138,11 @@ export default class UserController {
       if (!authGoogle) throw new CustomError(401, "Credentials doesn't match.");
 
       const token = createToken(
-        { id: user.id as string, email },
+        {
+          id: user.id as string,
+          email,
+          definedTheme: user.defined_theme as boolean,
+        },
         { expiresIn: "1d" }
       );
       return res.status(200).json({ token });
@@ -138,7 +162,11 @@ export default class UserController {
     }
 
     const token = createToken(
-      { id: user.id as string, email },
+      {
+        id: user.id as string,
+        email,
+        definedTheme: user.defined_theme as boolean,
+      },
       { expiresIn: "1d" }
     );
 
@@ -146,34 +174,40 @@ export default class UserController {
   }
 
   public async saveThemeSuggestions(req: Request, res: Response) {
-    const { id = ''} = new RequestParamValidator(req.params).uuid().validate();
+    const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
     const usersThemes: string[] = req.body.usersThemes;
 
     const themes = await userRepository.getThemes();
 
-    const invalidThemes = usersThemes.filter(theme => 
-      !themes.some(item => item.id === theme)
+    const invalidThemes = usersThemes.filter(
+      (theme) => !themes.some((item) => item.id === theme)
     );
 
     if (invalidThemes.length > 0) {
-      throw new CustomError(409, 'Invalid theme Id(s).');
+      throw new CustomError(409, "Invalid theme Id(s).");
     }
 
     return res.status(201).json({
-      data: await userRepository.insertUsersTheme(
-        id,
-        req.body.usersThemes
-      ),
+      data: await userRepository.insertUsersTheme(id, req.body.usersThemes),
     });
   }
 
   public async getUsersSuggestions(req: Request, res: Response) {
-    const { id = '' } = new RequestParamValidator(req.params).uuid().validate();
+    const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
 
     const themesNames = await userRepository.getUsersThemes(id);
     const suggestions = await suggestionService.generatePrompt(themesNames, 6);
     return res.status(200).json({
       data: suggestions,
+    });
+  }
+
+  public async getUsersThemesById(req: Request, res: Response) {
+    const usersTheme = await userRepository.getUsersThemesById(
+      req.user?.id as string
+    );
+    return res.status(200).json({
+      data: usersTheme,
     });
   }
 
@@ -185,7 +219,7 @@ export default class UserController {
   }
 
   public async getUsersPagesSuggetions(req: Request, res: Response) {
-    const { id = '' } = new RequestParamValidator(req.params).uuid().validate();
+    const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
 
     const themesNames = await userRepository.getUsersThemes(id);
     const pageData = await suggestionService.generatePagesSuggestions(
@@ -203,7 +237,9 @@ export default class UserController {
   }
 
   public async resetPassword(req: Request, res: Response) {
-    const { password = ''} = new RequestBodyValidator(req.body).password().validate();
+    const { password = "" } = new RequestBodyValidator(req.body)
+      .password()
+      .validate();
     const token = req.headers.authorization?.split(" ")[1] as string;
     const hashedPassword = await bcrypt.hash(password, 10);
     const authenticatedUser = verifyToken(token);

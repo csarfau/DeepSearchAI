@@ -4,12 +4,14 @@ export interface IUser {
     id?: string,
     email: string,
     password?: string,
-    google_id?: string
+    google_id?: string,
+    defined_theme?: boolean
 }
 
 export interface ILoginTokenPayload {
     id: string;
     email: string;
+    definedTheme: boolean
 }
 declare module 'express-serve-static-core' {
         interface Request {

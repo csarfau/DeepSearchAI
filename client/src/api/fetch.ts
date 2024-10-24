@@ -157,9 +157,7 @@ export const createApiClient = (authOptions: AuthOptions) => {
 
                     if (done) return;
                     
-
                     const stringDecoded = decoder.decode(value);
-                    console.log(stringDecoded);
                     
                     const jsonObjects = stringDecoded.split(/(?<=\})\s*(?=\{)/);
 
@@ -268,6 +266,10 @@ export const createApiClient = (authOptions: AuthOptions) => {
 
         getQueryById: async (id: string): Promise<IFetchResponse> => {
             return authenticatedFetch(baseUrl + `/search/${id}`)
-        }
+        },
+        // /user/themes
+        getUsersTheme: async (): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + '/user/themes')
+        },
     };
 };

@@ -15,6 +15,6 @@ userRouter.post('/user/:id/themes', (req, res) => userController.saveThemeSugges
 userRouter.get('/user/:id/suggestions', (req, res) => userController.getUsersSuggestions(req, res));
 userRouter.get('/themes', (req, res) => userController.getThemes(req, res));
 userRouter.get('/user/:id/pages/suggestions', (req, res) => userController.getUsersPagesSuggetions(req, res));
-
+userRouter.get('/user/themes', (req, res) => userController.getUsersThemesById(req, res));
 
 export default userRouter;

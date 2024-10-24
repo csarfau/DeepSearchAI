@@ -84,10 +84,10 @@ const ChatPage = () => {
                         display: 'flex',
                         alignItems: 'end',
                         padding: '0.5rem',
-                        width: {xs: '100%', sm:'80%'},
+                        width: { xs: '100%', sm:'80%' },
                         alignSelf: 'center'
                     }}>
-                        <textarea ref={queryRef} style={{background: '#FFFFFF'}} placeholder="Search for anything ..."/>
+                        <textarea ref={queryRef} style={{ background: '#FFFFFF' }} placeholder="Search for anything ..."/>
                         <IconButton onClick={() => handleUsersQuery()} aria-label="send">
                             <Send sx={{ color: theme.palette.primary.main }}/>
                         </IconButton>

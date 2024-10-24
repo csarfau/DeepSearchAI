@@ -8,8 +8,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Box, Button, Theme } from '@mui/material';
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
 
 const IndividualQuery:React.FC = () => {
     const { isLoading: isLoadingUser, user, token } = useUser();
@@ -17,7 +16,13 @@ const IndividualQuery:React.FC = () => {
     const showToast = useToast();
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const previousAddress = location.state?.from;
 
+    const urlParams = previousAddress.split('/')[2];
+    console.log(urlParams);
+    
+    
     const getQuery = async () => {
         if (!isLoadingUser && token && user ) {
 
@@ -40,6 +45,7 @@ const IndividualQuery:React.FC = () => {
         <Box
             sx={{
                 width: '100%',
+                
                 overflowY: 'auto',
                 boxSizing: 'border-box',
                 backgroundColor: (theme: Theme) => theme.palette.secondary.main,
@@ -101,7 +107,9 @@ const IndividualQuery:React.FC = () => {
                     margin: '0 auto'
                 }}
                 >
-                <Button onClick={() => navigate('/queries')}>
+                <Button onClick={() =>{
+                    urlParams ? navigate('/chat') : navigate(previousAddress);
+                }}>
                     Go back
                 </Button>
                 <ReactMarkdown
