@@ -37,6 +37,21 @@ export default class UserRepository implements IUserRepository {
         return user;
     }
 
+    public async updateUserById(user: IUser): Promise<Partial<IUser> | undefined > {
+        const dataToUpdate:Partial<IUser> = {
+            email: user.email
+        }
+
+        if(user.password) dataToUpdate.password = user.password;
+
+        const updatedUser = await db('users')
+            .where('id', user.id)
+            .update(dataToUpdate)
+            .returning('*')
+
+        return updatedUser[0]
+    }
+
     public async resetPassword(password: string, email: string): Promise<Partial<IUser> | undefined> {
         const user = await db('users')
             .where('email', email)
