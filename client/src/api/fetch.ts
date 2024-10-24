@@ -12,7 +12,7 @@ interface IGoogleResponse {
     error?: any
 }
 
-const baseUrl = 'http://localhost:5000/api';
+const baseUrl = import.meta.env.VITE_APP_API_URL || 'http://localhost:3000/api';
 
 export interface ITheme {
     id: string,
