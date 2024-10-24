@@ -1,21 +1,22 @@
-import { useState} from 'react';
-import Box from '@mui/material/Box';
+import MemoizedQueryList, { IQueryList } from './QueryList'; 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ListSubheader from '@mui/material/ListSubheader';
-import { useTheme } from '@mui/material/styles';
+import roundLogo from "@/assets/images/round-logo.svg";
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import {  Home, Person } from '@mui/icons-material';
-import { Avatar } from '@mui/material';
-import MemoizedQueryList, { IQueryList } from './QueryList'; 
-import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../hooks/useUser';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import { Avatar } from '@mui/material';
+import List from '@mui/material/List';
+import Box from '@mui/material/Box';
+import { useState} from 'react';
 
 const SideBard:React.FC<IQueryList> = (queryListProps) => {
     const [open, setOpen] = useState(false);
@@ -54,7 +55,7 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                         flexDirection: 'column',
                         alignItems: 'center',
                     }} component="div">
-                        <Avatar sx={{width: '1.5rem', height: '1.5rem'}} alt="logo" src="/src/assets/images/round-logo.svg"/>
+                        <Avatar sx={{width: '1.5rem', height: '1.5rem'}} alt="logo" src={roundLogo}/>
                         DeepSearchAI
                     </ListSubheader>
                 }>

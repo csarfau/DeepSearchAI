@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "build": "NODE_OPTIONS=--max_old_space_size=4096 tsc",
+    "start": "NODE_OPTIONS=--max_old_space_size=4096 ts-node src/index.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "knex:rollback-all": "knex --knexfile ./src/database/knex/envirolment.ts migrate:rollback --all",
-    "knex:rollback": "knex --knexfile ./src/database/knex/envirolment.ts migrate:rollback",
-    "knex:migrate": "knex --knexfile ./src/database/knex/envirolment.ts migrate:latest",
-    "knex:seed": "knex --knexfile ./src/database/knex/envirolment.ts seed:run"
+    "knex:rollback-all": "knex --knexfile ./src/database/knex/knexfile.ts migrate:rollback --all",
+    "knex:rollback": "knex --knexfile ./src/database/knex/knexfile.ts migrate:rollback",
+    "knex:migrate": "knex --knexfile ./src/database/knex/knexfile.ts migrate:latest",
+    "knex:seed": "knex --knexfile ./src/database/knex/knexfile.ts seed:run"
   },
   "keywords": [],
   "author": "Adrian Roger, Neuton Nakazono, Cesar Faustino",
@@ -40,6 +41,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/needle": "^3.3.0",
     "@types/node": "^22.5.5",
     "@types/nodemailer": "^6.4.16",
     "nodemon": "^3.1.6",

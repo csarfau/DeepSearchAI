@@ -1,14 +1,14 @@
 import React, { useState, useCallback, useEffect, useRef, ComponentPropsWithoutRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Box, Button, Theme } from '@mui/material';
 import { createApiClient, ResponseStreamType } from '../../../api/fetch';
-import { useUser } from '../../../hooks/useUser';
-import StepperContainer from './StepperContainer';
-import ErrorAlert from './ErrorAlert';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { useQuery, IQuerySideBar } from '../../../hooks/useQuery';
-
+import linkIcon from "@/assets/icons/link-icon.svg";
+import { Box, Button, Theme } from '@mui/material';
+import StepperContainer from './StepperContainer';
+import { useUser } from '../../../hooks/useUser';
+import ReactMarkdown from 'react-markdown';
+import ErrorAlert from './ErrorAlert';
 
 declare module "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus" {
     const style: { [key: string]: React.CSSProperties };
@@ -42,17 +42,13 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                 token,
                 userId: user?.id
             });
-
-            
         setSearchResults({
             type: 'firstStep',
             content: ''
         });
-    
-        
+
         await apiClient.streamingSearch(query, (response) => {
 
-            
         switch (response.type) {
                 case 'content':
                     setSearchResults(prev => ({
@@ -82,7 +78,6 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                     break;
                 }
         });
-        
         }
     }, [query, isUserLoading, user, token]);
 
@@ -134,7 +129,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                             content: "''", 
                             width: '0.8rem',
                             height: '0.8rem',
-                            backgroundImage: "url('/src/assets/icons/link-icon.svg')",
+                            backgroundImage: `url(${linkIcon})`,
                             backgroundSize: 'contain', 
                             backgroundRepeat: 'no-repeat', 
                             backgroundPosition: 'center' 
