@@ -24,7 +24,7 @@ services:
     restart: always
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
-      - NODE_ENV=production
+      - NODE_ENV=prod
       - PROD_DB_URL=postgresql://postgres:admin@postgres:5432/deepsearchdb
     networks:
       - app-network

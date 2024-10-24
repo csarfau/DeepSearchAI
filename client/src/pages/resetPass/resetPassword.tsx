@@ -5,6 +5,7 @@ import { useState } from "react";
 import useToast from "../../hooks/useToast";
 import { useNavigate, useParams } from "react-router-dom";
 import { createApiClient } from "../../api/fetch";
+import banner from "@/assets/icons/banner.svg";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -88,7 +89,7 @@ const ResetPassword = () => {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          backgroundImage: 'url(../src/assets/icons/banner.svg)',
+          backgroundImage: `url(${banner})`,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center'

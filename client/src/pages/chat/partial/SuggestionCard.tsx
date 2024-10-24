@@ -68,8 +68,6 @@ export const SuggestionCard: React.FC<IUserSuggestion> = ({ setterPromptChoice, 
                     color: theme.palette.primary.main
                 }}
                 onClick={() => {
-                    console.log(usersSuggestions[iconType]);
-                    
                     setterPromptChoice(usersSuggestions[iconType] || '');
                     setterTriggerResponse(true);
                 }}
