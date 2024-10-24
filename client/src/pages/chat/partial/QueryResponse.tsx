@@ -7,6 +7,7 @@ import { createApiClient, ResponseStreamType } from '../../../api/fetch';
 import { useUser } from '../../../hooks/useUser';
 import StepperContainer from './StepperContainer';
 import ErrorAlert from './ErrorAlert';
+import linkIcon from "@/assets/icons/link-icon.svg"
 
 declare module "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus" {
     const style: { [key: string]: React.CSSProperties };
@@ -106,7 +107,7 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                             content: "''", 
                             width: '0.8rem',
                             height: '0.8rem',
-                            backgroundImage: "url('/src/assets/icons/link-icon.svg')",
+                            backgroundImage: `url(${linkIcon})`,
                             backgroundSize: 'contain', 
                             backgroundRepeat: 'no-repeat', 
                             backgroundPosition: 'center' 

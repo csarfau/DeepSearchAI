@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { createApiClient } from "../../api/fetch";
 import { useGoogleLogin } from '@react-oauth/google';
+import logo from "@/assets/icons/logo.svg";
+import banner from "@/assets/icons/banner.svg";
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
@@ -269,7 +271,7 @@ const LoginPage = () => {
             }}>
               DeepSearchAI
             </Box>
-              <img style={{ transform: 'translateY(3px)'}} src="./src/assets/icons/logo.svg"/>
+              <img style={{ transform: 'translateY(3px)'}} src={ logo }/>
           </Typography>
           <Box sx={{
             width: '90%',
@@ -421,7 +423,7 @@ const LoginPage = () => {
             justifyContent: 'center',
             transition: 'left 0.7s ease-in-out',
             overflow: 'hidden',
-            backgroundImage: 'url(./src/assets/icons/banner.svg)',
+            backgroundImage: `url(${banner})`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center'
@@ -461,7 +463,7 @@ const LoginPage = () => {
                 }}>
                   DeepSearchAI
                 </Box>
-                  <img style={{ transform: 'translateY(3px)'}} src="./src/assets/icons/logo.svg"/>
+                  <img style={{ transform: 'translateY(3px)'}} src={ logo }/>
               </Typography>
               <Box sx={{
                 width: '90%',
