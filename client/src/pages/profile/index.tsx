@@ -25,8 +25,6 @@ const ProfilePage = () => {
     const getThemes = async () => {
 
         if (!isLoadingUser && token && user ) {
-            console.log(token);
-            
             const apiClient = createApiClient({token, userId: user.id });
             const response = await apiClient.getUsersTheme();
             if (response.error) return showToast(response.error, 'error');                           
