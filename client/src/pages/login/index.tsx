@@ -1,14 +1,14 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useGoogleLogin } from '@react-oauth/google';
+import { createApiClient } from "../../api/fetch";
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
+import banner from "@/assets/icons/banner.svg";
+import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
 import useToast from "../../hooks/useToast";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../hooks/useUser";
-import { createApiClient } from "../../api/fetch";
-import { useGoogleLogin } from '@react-oauth/google';
 import logo from "@/assets/icons/logo.svg";
-import banner from "@/assets/icons/banner.svg";
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
