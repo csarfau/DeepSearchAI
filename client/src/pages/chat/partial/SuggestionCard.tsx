@@ -76,13 +76,10 @@ export const SuggestionCard: React.FC<IUserSuggestion> = ({ setterPromptChoice, 
                         sx={{
                             width: '1.2rem',
                             height: '1.2rem',
-                            background: 'linear-gradient(147deg, rgba(151,0,209,1) 0%, rgba(157,0,200,1) 26%, rgba(222,0,105,1) 100%)',
-                            WebkitMaskImage: `url(${iconsPath[iconType]})`,
-                            WebkitMaskSize: 'cover',
-                            maskImage: `url(${iconsPath[iconType]})`,
-                            maskSize: 'cover',
                         }}
-                    />
+                    >
+                        {iconsPath[iconType]}
+                    </Box>
                     <Typography variant="body1">{usersSuggestions[iconType]}</Typography>
                 </Grid>
             ))}
