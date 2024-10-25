@@ -89,6 +89,28 @@ export default class UserRepository implements IUserRepository {
         });
     }
 
+    public async updateUsersThemes(themes: IUserTheme[]):Promise<Array<IUserTheme>> {
+        return await db.transaction(async trx => {
+            const updatePromises = themes.map(theme => {
+
+            return trx('users_theme')
+                .where({ id: theme.id })
+                .update({ theme_id: theme.theme_id })
+                .returning('*');
+            });
+    
+            const updatedResults = await Promise.all(updatePromises);
+            
+            return updatedResults.flat();
+        });
+    }
+
+    public async getUserFullRegistreUserThemes(userId: string):Promise<Array<IUserTheme>>{
+        return await db('users_theme')
+            .select('id', 'user_id', 'theme_id')
+            .where({user_id: userId})
+    }
+
     public async getUsersThemes(userID: string): Promise<Array<string>> {
 
         const usersThemesIDs = await db('users_theme')
