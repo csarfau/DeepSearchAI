@@ -89,6 +89,26 @@ export default class UserRepository implements IUserRepository {
         });
     }
 
+    public async updateUsersThemes(registers: string[], themes: string[]):Promise<Array<IUserTheme>> {
+        if (registers.length !== themes.length) {
+            throw new CustomError(400, 'The number of registers and themes must be equal.');
+        }
+
+        return await db.transaction(async trx => {
+            const updatePromises = registers.map((registerID, index) => {
+            const newThemeID = themes[index];
+            return trx('users_theme')
+                .where({ id: registerID })
+                .update({ theme_id: newThemeID })
+                .returning('*');
+            });
+    
+            const updatedResults = await Promise.all(updatePromises);
+            
+            return updatedResults.flat();
+        });
+    }
+
     public async getUsersThemes(userID: string): Promise<Array<string>> {
 
         const usersThemesIDs = await db('users_theme')
