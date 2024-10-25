@@ -21,10 +21,10 @@ const QueryList:React.FC<IQueryList> = ({ queryList, isLoading, isEmpty }) => {
                 
                 sx={{ 
                     borderRadius: '8px',
+                    paddingLeft: '0.2rem !important',  
                     '&:hover': {
                     backgroundColor: 'transparent',
-                    }
-                }}                        
+                }}}                        
                 >
                 <ListItemIcon sx={{minWidth: '2rem'}}>
                     <LibraryBooksIcon sx={{color: theme.palette.secondary.main, width: '1.2rem'}} />
@@ -61,9 +61,9 @@ const QueryList:React.FC<IQueryList> = ({ queryList, isLoading, isEmpty }) => {
             ) : (
                 queryList.map((queryData, index) => (
                     index < 5 ? (
-                        <ListItem key={index} 
+                        <ListItem key={index}
                             onClick={() => navigate(`/querie/${queryData.id}`, { state: { from: window.location.pathname } })}
-                            sx={{ 
+                            sx={{
                                 px: 1,
                                 py: 0,
                                 '&:hover': {

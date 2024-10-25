@@ -54,16 +54,17 @@ const ChatPage = () => {
                 <Container sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '2rem'
+                    gap: '2rem',
+                    height: 'auto'
                 }}>
                     <Box
                         sx={{
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'center',
-                            alignItems: 'center',
+                            alignItems: {xs: 'center'},
                             gap: '1rem',
-                            textAlign: 'center'
+                            textAlign: 'center',
                         }} 
                     >
                         <img style={{width: '3rem'}} src={ logo } alt="logo icon"/>
@@ -81,8 +82,7 @@ const ChatPage = () => {
                         </Typography>
                         <img style={{width: '1.2rem'}} src={arrowDownIcon} alt="arrow icon" />
                     </Box>
-                    <Paper elevation={1} sx={{
-                        overflow: 'hidden',
+                    <Paper elevation={1} sx={{                        
                         display: 'flex',
                         alignItems: 'end',
                         padding: '0.5rem',
@@ -106,7 +106,8 @@ const ChatPage = () => {
                     height: '100%', 
                     display: 'flex',
                     justifyContent: 'center',
-                    alignItems: 'stretch'
+                    alignItems: 'stretch',
+                    
                 }}>
                     {usersQuery &&
                         <QueryResponse query={ usersQuery } closeResponseAreaSetter={ setIsAnsweringUsersQuery }/>

@@ -59,37 +59,45 @@ const SuggestionPage = () => {
     }, [user, token, isUserLoading]);
         
     return (
-        <Box sx={{
-                px: 0,
-                width: '100%',
-                transition: 'transform 1s ease-in-out', 
-                transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
-                display: 'flex',
-                justifyContent: 'center',
-            }}>
-            <Paper elevation={2} sx={{
-                minHeight: {md: '95vh'},
-                width:{ xs: '100%', md: '90%'},
+        <Box
+        sx={{
+            width: '100%',
+            height: '100vh', 
+            transition: 'transform 1s ease-in-out',
+            transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: { sm: 'center' },
+            overflowY: 'auto', 
+            WebkitOverflowScrolling: 'touch',
+        }}
+    >
+        <Paper
+            elevation={2}
+            sx={{
+                minHeight: { xs: 'auto', sm: '95vh' },  
+                width: { xs: '100%', md: '90%' },
                 boxSizing: 'border-box',
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: {sm: 'center'},
                 flexDirection: 'column',
                 gap: '1rem',
                 alignItems: 'center',
-                py: '2rem',
+                p: { xs: '1rem', md: '2rem' },
                 backgroundColor: theme.palette.secondary.main,
                 border: theme.borders.secondary,
-                
-            }}>
+                overflowY: { xs: 'auto', sm: 'visible' }, 
+            }}
+        >
                 <Box sx={{textAlign: 'center'}}>
-                    <Typography variant='h4'>
+                    <Typography sx={{ fontSize: { xs: '1.5rem', md: '2rem'}}}>
                         What are you interested in?
                     </Typography>
                     <Typography variant='body2' sx={{color: theme.palette.text.secondary, px: '0.5rem'}}>
                         Choose Your Preferences for Personalized AI Suggestions
                     </Typography>
                 </Box>
-                <Grid container spacing={2} justifyContent="center" sx={{ px: '1rem', boxSizing: 'border-box', maxWidth: '30rem'}}>
+                <Grid container spacing={2} justifyContent="center" sx={{ maxWidth: '30rem'}}>
                     {loading ? (
                         Array.from({ length: 9 }).map((_, index) => (
                             <Grid key={index} size={{ xs: 6, sm: 4 }}>
