@@ -12,6 +12,7 @@ userRouter.put('/user/reset-pass', (req, res) => userController.resetPassword(re
 userRouter.use(authMiddleware);
 userRouter.put('/user', (req, res) => userController.updateUserById(req, res));
 userRouter.post('/user/:id/themes', (req, res) => userController.saveThemeSuggestions(req, res));
+userRouter.put('/user/themes', (req, res) => userController.updateUserThemes(req, res));
 userRouter.get('/user/:id/suggestions', (req, res) => userController.getUsersSuggestions(req, res));
 userRouter.get('/themes', (req, res) => userController.getThemes(req, res));
 userRouter.get('/user/:id/pages/suggestions', (req, res) => userController.getUsersPagesSuggetions(req, res));
