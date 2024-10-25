@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import SuggestionGenerationService from "../services/suggestionGenerationService";
 import UserRepository from "../repositories/userRepository";
-import { IUser } from "../types/user";
+import { IUser, IUserTheme } from "../types/user";
 import bcrypt, { compare } from "bcrypt";
 import { createToken, verifyToken } from "../utils/token";
 import createEmailToRecoverPassword from "../services/emailSenderPass";
@@ -168,6 +168,14 @@ export default class UserController {
     const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
     const usersThemes: string[] = req.body.usersThemes;
 
+    if(id !== req.user?.id){
+      throw new CustomError(403, 'Unauthorized Action.');
+    }
+
+    if(usersThemes.length !== 4){
+      throw new CustomError(400, 'Invalid number of themes.');
+    }
+
     const themes = await userRepository.getThemes();
 
     const invalidThemes = usersThemes.filter(
@@ -181,6 +189,34 @@ export default class UserController {
     return res.status(201).json({
       data: await userRepository.insertUsersTheme(id, req.body.usersThemes),
     });
+  }
+
+  public async updateUserThemes(req:Request, res: Response){
+    const id = req.user?.id as string;
+    const newThemes: string[] = req.body.usersThemes;
+
+    if(newThemes.length !== 4){
+      throw new CustomError(400, 'Invalid number of themes.');
+    }
+
+    const oldThemes: IUserTheme[] = await userRepository.getUserFullRegistreUserThemes(id);
+
+    const themesToUpdate = oldThemes.filter(theme => 
+      !newThemes.some(item => item === theme.theme_id)
+    );
+
+    const availableNewThemes = newThemes.filter(newTheme =>
+      !oldThemes.some(oldTheme => oldTheme.theme_id === newTheme)
+    );
+
+    const updatedThemes: IUserTheme[] = themesToUpdate.map((theme, index) => ({
+      ...theme,
+      theme_id: availableNewThemes[index] 
+    }));
+
+    const updated = await userRepository.updateUsersThemes(updatedThemes);
+
+    return res.status(200).json({data: updated});
   }
 
   public async getUsersSuggestions(req: Request, res: Response) {
