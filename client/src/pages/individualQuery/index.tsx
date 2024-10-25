@@ -42,8 +42,7 @@ const IndividualQuery:React.FC = () => {
     return (
         <Box
             sx={{
-                width: '100%',
-                
+                width: '100%',                
                 overflowY: 'auto',
                 boxSizing: 'border-box',
                 backgroundColor: (theme: Theme) => theme.palette.secondary.main,
@@ -101,7 +100,7 @@ const IndividualQuery:React.FC = () => {
         >
             <Box
                 sx={{
-                    maxWidth: '45rem',  
+                    maxWidth: '50rem',                       
                     margin: '0 auto'
                 }}
                 >
