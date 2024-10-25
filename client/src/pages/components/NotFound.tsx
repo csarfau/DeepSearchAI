@@ -1,4 +1,5 @@
 import { Alert,  AlertTitle,  Box } from '@mui/material';
+import failIcon from '@/assets/icons/fail-icon.svg';
 import { theme } from '../../App';
 
 interface ErrorAlertProps {
@@ -20,7 +21,7 @@ const NotFound: React.FC<ErrorAlertProps> = ({ message  }) => {
         >
             <Alert
                 severity="info"
-                icon={<img style={{ width: '2rem' }} src='/src/assets/icons/fail-icon.svg' />}
+                icon={<img style={{ width: '2rem' }} src={failIcon} />}
                 sx={{
                     padding: '2rem',
                     maxWidth: '30rem',
