@@ -74,6 +74,6 @@ export const OptionThemeCard:React.FC<IOptionThemeCard> = ({
                 {iconsPath[label]}
             </Box>
             <Typography variant='body2'>{label}</Typography>
-        </Box>
+        </Box>
     )
 }
