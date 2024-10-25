@@ -70,13 +70,9 @@ export const OptionThemeCard:React.FC<IOptionThemeCard> = ({
 
     return (
         <Box  sx={{ ...baseStyles }} onClick={ onClick }>
-            <img style={{
-                width: '1.5rem',
-                filter: isSelected ? 
-                    'invert(0%)'
-                    : 
-                    'brightness(0) saturate(100%) invert(13%) sepia(75%) saturate(5186%) hue-rotate(271deg) brightness(89%) contrast(105%)' 
-                }} src={iconsPath[label]} alt={`icon ${label}`} />
+            <Box>
+                {iconsPath[label]}
+            </Box>
             <Typography variant='body2'>{label}</Typography>
         </Box>
     )
