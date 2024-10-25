@@ -269,6 +269,7 @@ const LoginPage = () => {
               zIndex: 1
             }
             )
+
           }}>
           {/* form login */}
           <Box sx={{ 
@@ -285,7 +286,7 @@ const LoginPage = () => {
               Welcome to 
               <span className="span-gradient-title"> DeepSearchAI</span>
             </Typography>
-            <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src="./src/assets/icons/logo.svg"/>
+            <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src={logo}/>
           </Box>
           <Box sx={{
             width: '90%',
@@ -520,18 +521,9 @@ const LoginPage = () => {
                   fontWeight: '400',
                 }}>
                 Welcome to 
-                <Box component="span" className="text-gradient" sx={{ 
-                  fontSize: '32px', 
-                  fontWeight: '600', 
-                  color: 'pink', 
-                  paddingLeft: 1, 
-                  paddingRight: 1,
-                }}>
-                  DeepSearchAI
-                </Box>
-                  <img style={{ transform: 'translateY(3px)'}} src="./src/assets/icons/logo.svg"/>
+                <span className="span-gradient-title"> DeepSearchAI</span>
               </Typography>
-              <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src="./src/assets/icons/logo.svg"/>
+                <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src={logo}/>
               </Box>
               <Box sx={{
                 width: '90%',
