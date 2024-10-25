@@ -1,12 +1,14 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useGoogleLogin } from '@react-oauth/google';
+import { createApiClient } from "../../api/fetch";
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
+import banner from "@/assets/icons/banner.svg";
+import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
 import useToast from "../../hooks/useToast";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../hooks/useUser";
-import { createApiClient } from "../../api/fetch";
-import { useGoogleLogin } from '@react-oauth/google';
+import logo from "@/assets/icons/logo.svg";
 
 const LoginPage = () => {
   const [registerChoice, setRegisterChoice] = useState(false);
@@ -438,7 +440,7 @@ const LoginPage = () => {
             flexDirection: 'column',
             transition: 'left 0.7s ease-in-out',
             overflow: 'hidden',
-            backgroundImage: 'url(./src/assets/icons/banner.svg)',
+            backgroundImage: `url(${banner})`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center'
@@ -518,7 +520,16 @@ const LoginPage = () => {
                   fontWeight: '400',
                 }}>
                 Welcome to 
-                <span className="span-gradient-title"> DeepSearchAI</span>
+                <Box component="span" className="text-gradient" sx={{ 
+                  fontSize: '32px', 
+                  fontWeight: '600', 
+                  color: 'pink', 
+                  paddingLeft: 1, 
+                  paddingRight: 1,
+                }}>
+                  DeepSearchAI
+                </Box>
+                  <img style={{ transform: 'translateY(3px)'}} src="./src/assets/icons/logo.svg"/>
               </Typography>
               <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src="./src/assets/icons/logo.svg"/>
               </Box>

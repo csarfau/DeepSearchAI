@@ -1,14 +1,15 @@
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useEffect, useState, ComponentPropsWithoutRef  } from "react";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { useNavigate, useLocation } from "react-router-dom";
+import linkIcon from '@/assets/icons/link-icon.svg';
+import { Box, Button, Theme } from '@mui/material';
 import { createApiClient } from "../../api/fetch";
 import { useUser } from "../../hooks/useUser"; 
+import { useParams } from "react-router-dom";
 import useToast from "../../hooks/useToast"; 
-import { useEffect, useState, ComponentPropsWithoutRef  } from "react";
 import { IQueries } from "../queryHistory"; 
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Box, Button, Theme } from '@mui/material';
-import { useParams } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
 
 const IndividualQuery:React.FC = () => {
     const { isLoading: isLoadingUser, user, token } = useUser();
@@ -20,9 +21,6 @@ const IndividualQuery:React.FC = () => {
     const previousAddress = location.state?.from;
 
     const urlParams = previousAddress.split('/')[2];
-    console.log(urlParams);
-    
-    
     const getQuery = async () => {
         if (!isLoadingUser && token && user ) {
 
@@ -82,7 +80,7 @@ const IndividualQuery:React.FC = () => {
                     content: "''", 
                     width: '0.8rem',
                     height: '0.8rem',
-                    backgroundImage: "url('/src/assets/icons/link-icon.svg')",
+                    backgroundImage: `url(${linkIcon})`,
                     backgroundSize: 'contain', 
                     backgroundRepeat: 'no-repeat', 
                     backgroundPosition: 'center' 

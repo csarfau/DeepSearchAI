@@ -7,6 +7,8 @@ import useToast from "../../hooks/useToast"
 import { IUserSuggestion, SuggestionCard, SuggestionCardSkeleton } from "./partial/SuggestionCard"
 import { useUser } from "../../hooks/useUser"
 import QueryResponse from "./partial/QueryResponse"
+import logo from "@/assets/icons/logo.svg";
+import arrowDownIcon from "@/assets/icons/arrow-down-icon.svg"
 
 const ChatPage = () => {
     const [promptSuggestions, setPromptSuggestion ] = useState<IUserSuggestion>();
@@ -65,7 +67,7 @@ const ChatPage = () => {
                             textAlign: 'center',
                         }} 
                     >
-                        <img style={{width: '2rem'}} src="/src/assets/images/logo.svg" alt="logo icon"/>
+                        <img style={{width: '3rem'}} src={ logo } alt="logo icon"/>
                         <Typography variant="h5"
                             sx={{
                                 maxWidth: '28rem',
@@ -78,7 +80,7 @@ const ChatPage = () => {
                         >
                             Enter your query below to get AI-powered insights and references.
                         </Typography>
-                        <img style={{width: '1.2rem'}} src="/src/assets/icons/arrow-down-icon.svg" alt="arrow icon" />
+                        <img style={{width: '1.2rem'}} src={arrowDownIcon} alt="arrow icon" />
                     </Box>
                     <Paper elevation={1} sx={{                        
                         display: 'flex',
