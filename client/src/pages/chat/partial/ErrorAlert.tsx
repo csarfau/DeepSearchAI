@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { Alert, AlertTitle, Box } from '@mui/material';
 import { Close as CloseIcon,  } from '@mui/icons-material';
+import { Alert, AlertTitle, Box } from '@mui/material';
+import failIcon from '@/assets/icons/fail-icon.svg';
+import React, { useEffect } from 'react';
 import { theme } from '../../../App';
 
 interface ErrorAlertProps {
@@ -29,7 +30,7 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, closeResponseAreaSette
         >
             <Alert
                 severity="info"
-                icon={<img style={{ width: '1.5rem' }} src='/src/assets/icons/fail-icon.svg' />}
+                icon={<img style={{ width: '1.5rem' }} src={failIcon} />}
                 action={
                     <CloseIcon
                         onClick={() => closeResponseAreaSetter(false)}
