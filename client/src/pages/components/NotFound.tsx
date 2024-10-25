@@ -1,4 +1,3 @@
-
 import { Alert,  AlertTitle,  Box } from '@mui/material';
 import failIcon from '@/assets/icons/fail-icon.svg';
 import { theme } from '../../App';

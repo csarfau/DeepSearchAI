@@ -1,14 +1,14 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createApiClient } from "../../api/fetch";
 import { useUser } from "../../hooks/useUser";
 import useToast from "../../hooks/useToast";
-import { Box, IconButton,  Tooltip, Typography } from "@mui/material";
+import { Box, IconButton,  InputBase,  Tooltip, Typography } from "@mui/material";
 import { theme } from "../../App";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import TimeAgo from "./partial/TimeAgo";
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
-import SearchInput from "./partial/SearchInput";
+import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
 import NotFound from "../components/NotFound";
@@ -26,38 +26,60 @@ const QueryHistoryAll = () => {
     const [ allQueries, setAllQueries ] = useState<Array<IQueries>>([]);
     const [ isLoading, setIsloading] = useState(true);
     const [ offset, setOffset ] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
     const [ pageNumbers, setPageNumbers ] = useState(1);
     const navigate = useNavigate();
     const showToast = useToast();
     const limit = 10;
 
-    const getQueries = async (filterBy?:string) => {
+    const getQueries = async () => {
         if (!isLoadingUser && token && user ) {
+            
             const apiClient = createApiClient({token, userId: user.id })
-            const response = await apiClient.getAllQueries(limit, offset, filterBy);
+            
+            const response = searchTerm ? 
+                await apiClient.getAllQueries(limit, offset, searchTerm) :
+                await apiClient.getAllQueries(limit, offset);
+
             if (response.error) return showToast(response.error, 'error');                           
             setPageNumbers(response.data.pageNumbers);
-    
-            filterBy ? setAllQueries(response.data.searches) : setAllQueries(prevQueries => [...prevQueries, ...response.data.searches]);
+
+            if (searchTerm) {
+                setAllQueries(response.data.searches);
+                setIsloading(false);
+                return 
+            } 
+            
+            setAllQueries(prevQueries => [...prevQueries, ...response.data.searches]);
             setIsloading(false);
         }
     }
 
+    useEffect(() => {
+        getQueries();
+    }, [offset, searchTerm, isLoadingUser])
+    
     const loadMoreQueries = () => {
         if (pageNumbers === 1 ) return;
         setOffset((prevOffset) => prevOffset + limit);
     };
-    
-    useEffect(() => {
-        getQueries();
-    }, [isLoadingUser, offset]);
 
+    const handleSearch = (value: string) => {
+        if (value === '') {
+            getQueries();
+            return 
+        };        
+
+        setOffset(0);
+        setSearchTerm(value);
+    }
+    
     const removeMarkdown = (text:string) => {
         return text
-            .replace(/^#+\s/gm, '') 
-            .replace(/\*\*(.*?)\*\*/g, '$1')
-            .replace(/\*(.*?)\*/g, '$1')
-            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/^#+\s/gm, '') 
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
             .replace(/^\d+\.\s/gm, '')
             .replace(/^-\s/gm, '')
             .replace(/^>\s/gm, '')
@@ -71,6 +93,7 @@ const QueryHistoryAll = () => {
             overflow: 'auto', 
             boxSizing: 'border-box',
             position: 'relative',
+            zIndex: 10, 
             '&::-webkit-scrollbar': {
                 width: '0.4rem'
             },
@@ -81,29 +104,57 @@ const QueryHistoryAll = () => {
             '&::-webkit-scrollbar-thumb': {
                 background: 'rgb(108, 87, 117)',
                 outline: '1px solid slategrey'
-            }                   
-            
+            }                         
         }}>            
             <Box sx={{
-                display: 'flex',  
-                width: '100%',                
+                display: 'flex',         
                 maxWidth: '50rem',  
-                margin: '0 auto ',
-                justifyContent: 'space-between',
-                alignItems: 'start',
-                }}>
+                margin: '0 auto', 
+                gap: '1rem', 
+                justifyContent: {xs: 'center', sm:'space-between'},
+                alignContent: 'center',
+                flexWrap: {xs: 'wrap', sm: 'nowrap'}, 
+                padding: { xs: '0 1rem', md: '0'}
+            }}>
                 <Box sx={{ display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
                     <LibraryBooksIcon sx={{color: theme.palette.text.primary, width: '1.2rem', justifySelf: 'start'}} />
-                    <Typography 
+                    <Typography
                         variant="h5"
                         sx={{
                             color: theme.palette.text.primary
                         }}
                     >
-                        Query History
+                    Query History
                     </Typography>
                 </Box>
-                <SearchInput onSearch={getQueries} placeholder="Search your queries ..."/>
+                <Box
+                    sx={{
+                        borderRadius: '0.5rem',
+                        backgroundColor: theme.palette.mode === 'light' 
+                            ? 'rgba(0, 0, 0, 0.04)' 
+                            : 'rgba(255, 255, 255, 0.103)',
+                        '&:hover': {
+                            backgroundColor: theme.palette.mode === 'light' 
+                                ? 'rgba(0, 0, 0, 0.08)' 
+                                : 'rgba(255, 255, 255, 0.13)',
+                        },
+                        p: '0.2rem 0.5rem', 
+                        width: '100%',
+                        maxWidth: '20rem', 
+                        boxSizing: 'border-box'
+                    }}
+                >
+                    <InputBase
+                        onChange={(e) => handleSearch(e.target.value)}
+                        placeholder={'search your queries ...'}
+                        sx={{
+                            color: 'inherit',
+                            width: '100%',
+                        }}
+                        startAdornment={<SearchIcon />}
+                        inputProps={{ 'aria-label': 'search' }}
+                    />
+                </Box>
             </Box>
                 {
                 !isLoading ? 
@@ -176,11 +227,11 @@ const QueryHistoryAll = () => {
                     }}/>
                 
             }
-            {allQueries.length === 0 &&
+            {allQueries.length === 0 && !isLoading &&
                 <NotFound message="We couldn't find any items that match your filter."/>
             }
 
-            {pageNumbers > 1 && (
+            {pageNumbers > 1 && (limit * pageNumbers - allQueries.length) >= limit && (
                 <Box 
                     sx={{ 
                         display: 'flex', 

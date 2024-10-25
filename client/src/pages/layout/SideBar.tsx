@@ -8,6 +8,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {  Home, Person } from '@mui/icons-material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../hooks/useUser';
@@ -17,6 +18,7 @@ import { Avatar } from '@mui/material';
 import List from '@mui/material/List';
 import Box from '@mui/material/Box';
 import { useState} from 'react';
+
 
 const SideBard:React.FC<IQueryList> = (queryListProps) => {
     const [open, setOpen] = useState(false);
@@ -65,15 +67,17 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                             replace: true,
                         })}
                         sx={{
-                            mt: '1rem'
-                        }}                        
+                            mt: '1rem',
+                            padding: { xs: '0.5rem 0.2rem' }
+                        }}                  
                         >
-                        <ListItemIcon sx={{minWidth: '2rem'}}> 
+                        <ListItemIcon sx={{ minWidth: '2rem' }}> 
                             <Home sx={{color: theme.palette.secondary.main, width: '1.2rem'}}/>
                         </ListItemIcon>
                         <ListItemText 
-                            sx={{color: 
-                                theme.palette.secondary.main}}  
+                            sx={{
+                                color: theme.palette.secondary.main,
+                            }}  
                                 primary={'Home'} 
                         />
                     </ListItemButton>
@@ -81,12 +85,15 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                         onClick={() => navigate('/profile', {
                             replace: true,
                         })}
+                        sx={{
+                            padding: { xs: '0.5rem 0.2rem' }
+                        }}
                     >
                         <ListItemIcon sx={{minWidth: '2rem'}} >
                             <Person sx={{color: theme.palette.secondary.main, width: '1.2rem'}} />
                         </ListItemIcon>
                         <ListItemText 
-                            sx={{color: 
+                            sx={{color:
                                 theme.palette.secondary.main}}  
                                 primary={'Profile'} 
                         />
@@ -100,6 +107,17 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
                     startIcon={<LogoutIcon/>}>
                     Logout
                 </Button>
+                {open && 
+                    <Button onClick={toggleDrawer(true)} size='small' variant='text' sx={{ 
+                        position: 'absolute', top: 5 , right: 1,
+                        borderRadius: '0.5rem', 
+                        bgcolor: 'inherit', 
+                        cursor: 'pointer',
+                        zIndex: 5
+                        }}>
+                        <MenuIcon sx={{color: theme.palette.secondary.main}}/>
+                    </Button>
+                }
             </Box>  
             )
     };
@@ -124,9 +142,13 @@ const SideBard:React.FC<IQueryList> = (queryListProps) => {
 
         {isSmallScreen && (
             <>
-                <Button onClick={toggleDrawer(true)} sx={{ 
-                    position: 'fixed', bottom: 16, right: 16 }}>
-                    Open Drawer
+                <Button onClick={toggleDrawer(true)} size='small' variant='text' sx={{ 
+                    position: 'fixed', top: 3, left: 3,
+                    borderRadius: '0.5rem', 
+                    bgcolor: theme.palette.secondary.main, 
+                    margin: { md:'1rem'}
+                    }}>
+                    <MenuIcon sx={{color: theme.palette.primary.main}}/>
                 </Button>
                 <SwipeableDrawer
                     sx={{
