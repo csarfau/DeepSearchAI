@@ -166,6 +166,14 @@ export default class UserController {
     const { id = "" } = new RequestParamValidator(req.params).uuid().validate();
     const usersThemes: string[] = req.body.usersThemes;
 
+    if(id !== req.user?.id){
+      throw new CustomError(403, 'Unauthorized Action.');
+    }
+
+    if(usersThemes.length !== 4){
+      throw new CustomError(400, 'Invalid number of themes.');
+    }
+
     const themes = await userRepository.getThemes();
 
     const invalidThemes = usersThemes.filter(
