@@ -24,6 +24,11 @@ interface AuthOptions {
     userId: string | null;
 }
 
+export interface IUser {
+    email?:string,
+    password?: string
+} 
+
 const createAuthenticatedFetch = (authOptions: AuthOptions) => {
 
     return async (url: string, options: RequestInit = {}): Promise<IFetchResponse> => {
@@ -267,9 +272,17 @@ export const createApiClient = (authOptions: AuthOptions) => {
         getQueryById: async (id: string): Promise<IFetchResponse> => {
             return authenticatedFetch(baseUrl + `/search/${id}`)
         },
-        // /user/themes
+        
         getUsersTheme: async (): Promise<IFetchResponse> => {
             return authenticatedFetch(baseUrl + '/user/themes')
         },
+
+        updateUser: async (newData:IUser): Promise<IFetchResponse> => {
+            return authenticatedFetch(baseUrl + `/user`, {
+                method: 'put',
+                body: JSON.stringify(newData),
+            })
+
+        }
     };
 };

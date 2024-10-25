@@ -117,8 +117,8 @@ const EnhancedQueryResponse: React.FC<EnhancedQueryResponseProps> = ({ query, cl
                             fontWeight: 'bold',
                             marginRight: '1.3rem',
                             maxWidth: '30rem',
-                            '-webkit-box-orient': 'vertical',
-                            '-webkit-line-clamp': 1,
+                            WebkitBoxOrient: 'vertical',  
+                            WebkitLineClamp: 1,
                             textOverflow: 'ellipsis'
                             
                         },
