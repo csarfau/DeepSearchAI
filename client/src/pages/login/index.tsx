@@ -221,7 +221,7 @@ const LoginPage = () => {
   return (
     <Box  sx={{
       width: '100%',
-      px: '2rem',
+      px: { md: '2rem' },
       height: '100vh',
       display: 'flex',
       justifyContent: 'center',
@@ -230,11 +230,12 @@ const LoginPage = () => {
       overflow: 'hidden'
     }}>
       <Paper elevation={2} sx={{
-        minHeight: '95vh',
-        width: '90%',
+        minHeight: {xs:'100vh', md: '95vh'},
+        width: {xs: '100%', md: '90%'},
         boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'space-between',
+        background: theme.palette.secondary.main,
         alignItems: 'center',
         border: theme.borders.secondary,
         position: 'relative',
@@ -242,13 +243,15 @@ const LoginPage = () => {
         transition: 'transform 1s ease-in-out',
         ...(isFinishedRegister && {transform: 'translateX(-200%)'})
       }}>
-        {/* Container Login */}
         <Box sx={{ 
-          width: { 
+          minWidth: { 
             xs: '100%', 
-            lg: '50%'
+            lg: '50%', 
           },
-          display: !registerChoice ? 'flex' : { sx: 'none', lg: 'flex' },
+          display: {
+            xs: registerChoice ? 'none' : 'flex',  
+            lg: 'flex'                             
+          }, 
           flexDirection: 'column', 
           alignItems: 'center',
           gap: '2rem',
@@ -266,20 +269,25 @@ const LoginPage = () => {
               zIndex: 1
             }
             )
-        }}>
-          <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: '28px', fontWeight: '400' }}>
-            Welcome to 
-            <Box component="span" className="text-gradient" sx={{ 
-              fontSize: '32px', 
-              fontWeight: '600', 
-              color: 'pink', 
-              paddingLeft: 1, 
-              paddingRight: 1,
-            }}>
-              DeepSearchAI
-            </Box>
-              <img style={{ transform: 'translateY(3px)'}} src={ logo }/>
-          </Typography>
+
+          }}>
+          {/* form login */}
+          <Box sx={{ 
+            display: 'flex',
+            flexDirection: { xs: 'column-reverse', md: 'row'},
+            justifyContent: 'center', 
+            gap: '0.5rem' 
+          }}>
+            <Typography variant="h6" 
+              sx={{ color: theme.palette.text.secondary, 
+                fontSize: { xs: '22px', sm: '25px',  md:'28px'},  
+                fontWeight: '400',
+              }}>
+              Welcome to 
+              <span className="span-gradient-title"> DeepSearchAI</span>
+            </Typography>
+            <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src={logo}/>
+          </Box>
           <Box sx={{
             width: '90%',
             display: 'flex',
@@ -477,39 +485,46 @@ const LoginPage = () => {
                 xs: '100%', 
                 lg: '50%', 
               },
-              display: registerChoice ? 'flex' : { sx: 'none', lg: 'flex'} , 
+              display: {
+                xs: !registerChoice ? 'none' : 'flex',  
+                lg: 'flex'                             
+              }, 
               flexDirection: 'column', 
               alignItems: 'center',
               gap: '2rem',
-              ...(!registerChoice ? {
-                  transform: 'translateX(-100%)',
-                  zIndex: 0,
-                  opacity: 0,
-                  transition: 'transform 1s ease-in-out , opacity 0.5s ease-in-out',
-                }
-                :
+              ...(registerChoice ? 
                 {
                   transition: 'transform 0.8s ease-in-out , opacity 1.6s ease-in',
                   transform: 'translateX(0)',
                   zIndex: 1,
                   opacity: 1
                 }
+                :
+                {
+                  transform: 'translateX(-100%)',
+                  zIndex: 0,
+                  opacity: 0,
+                  transition: 'transform 1s ease-in-out , opacity 0.5s ease-in-out',
+                }
               )
             }}
             >
-              <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: '28px', fontWeight: '400' }}>
-                Welcome to 
-                <Box component="span" className="text-gradient" sx={{ 
-                  fontSize: '32px', 
-                  fontWeight: '600', 
-                  color: 'pink', 
-                  paddingLeft: 1, 
-                  paddingRight: 1,
+            <Box sx={{ 
+              display: 'flex',
+              flexDirection: { xs: 'column-reverse', md: 'row'},
+              justifyContent: 'center', 
+              gap: '0.5rem' 
+            }}>
+              <Typography variant="h6" 
+                sx={{ color: theme.palette.text.secondary, 
+                  fontSize: { xs: '22px', sm: '25px',  md:'28px'}, 
+                  fontWeight: '400',
                 }}>
-                  DeepSearchAI
-                </Box>
-                  <img style={{ transform: 'translateY(3px)'}} src={ logo }/>
+                Welcome to 
+                <span className="span-gradient-title"> DeepSearchAI</span>
               </Typography>
+                <img style={{ width: '2rem', alignSelf: 'center', transform: 'translateY(-3px)'}} src={logo}/>
+              </Box>
               <Box sx={{
                 width: '90%',
                 maxWidth: '30rem',
@@ -665,12 +680,10 @@ const LoginPage = () => {
                   onClick={handleRegister}
                   variant="contained" 
                   size="large" 
-                  sx={{ background: theme.palette.gradients.text }}
+                  sx={{ background: theme.palette.gradients.text, mt: '1rem' }}
                 >
                   SIGN UP
                 </Button>
-                <Typography sx={{alignSelf: 'center'}}>or</Typography>
-                <Button variant="outlined" size="large" sx={{ border: theme.borders.primary }}>SIGN UP WITH GOOGLE</Button>
               </Box>
             </Box>
       </Paper>

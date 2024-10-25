@@ -67,8 +67,9 @@ const AuthenticatedLayout = () => {
                     justifyContent: 'center',
                     flexDirection: 'column',
                     gap: '2rem',
-                    alignItems: 'center',
+                    alignItems: {xs: 'start', sm: 'center'},
                     py: '2rem',
+                    overflow: 'auto', 
                     backgroundColor: theme.palette.secondary.main,
                     border: theme.borders.secondary
                 }}> 

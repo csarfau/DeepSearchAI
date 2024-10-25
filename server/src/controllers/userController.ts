@@ -101,21 +101,17 @@ export default class UserController {
   }
 
   public async login(req: Request, res: Response) {
-    const { email = "", password = "" } = new RequestBodyValidator(req.body)
-      .email()
-      .password()
-      .validate();
     const { googleId } = req.body;
 
     if (googleId) {
-      const user = await userRepository.getUserByEmail(email);
+      const user = await userRepository.getUserByEmail(req.body.email);
 
       if (!user) {
-        const user = await this.createGoogleUser(email, googleId);
+        const user = await this.createGoogleUser(req.body.email, googleId);
         const token = createToken(
           {
             id: user.id as string,
-            email,
+            email: req.body.email,
             definedTheme: user.defined_theme as boolean,
           },
           { expiresIn: "1d" }
@@ -129,13 +125,19 @@ export default class UserController {
       const token = createToken(
         {
           id: user.id as string,
-          email,
+          email: req.body.email,
           definedTheme: user.defined_theme as boolean,
         },
         { expiresIn: "1d" }
       );
       return res.status(200).json({ token });
     }
+
+    const { email = "", password = "" } = new RequestBodyValidator(req.body)
+      .email()
+      .password()
+      .validate();
+ 
 
     const user = await userRepository.getUserByEmail(email);
     if (!user) {

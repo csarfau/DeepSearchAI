@@ -95,7 +95,7 @@ const StepperContainer: React.FC<StepperContainerProps> = ({ currentStep }) => {
             pt: '3rem',
             boxSizing: 'border-box'
         }}>
-            <Box sx={{textAlign: 'center'}}>
+            <Box sx={{textAlign: 'center', padding: {xs:'0.5rem', md: '0'}}}>
                 <Typography variant='h5' color={theme.palette.text.primary}>
                     Your Answer in Progress
                 </Typography>
@@ -103,7 +103,7 @@ const StepperContainer: React.FC<StepperContainerProps> = ({ currentStep }) => {
                     Follow the steps as we gather, evaluate, and craft the best possible response to your query.
                 </Typography>
             </Box>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ width: {xs:'95%', md: '100%'}, alignSelf: 'center'  }}>
                 <LinearProgressWithLabel value={progress} />
             </Box>
             <Box sx={{
