@@ -212,50 +212,67 @@ export default class SearchAiResponseGenerateService {
     urlContents: IFilteredResultContent[]
   ): Array<{ role: "user" | "assistant" | "system"; content: string }> {
     const contentTemplate = `
-         Based on the following query: "${userQuery}" and the content from various sources listed below, write a detailed,
-        informative, and helpful search result report about the topic.
-    
-        REMEMBER: FOR EACH PIECE OF INFORMATION, REFERENCE THE SOURCE BY THE CORRESPONDING NUMBER.
-        MAKE SURE NOT TO MAKE UP OR USE INFORMATION YOU IMPLICITLY KNOW, INSTEAD ONLY GET INFORMATION FROM THE SOURCES.
-        ALL INFORMATION IN THE REPORT MUST HAVE A REFERENCE TO THE SOURCE.
-    
-        Use multiple sources to complement the report. Provide the report in markdown format.
-    
-        Here is the content from the different sources:
-    
-        ${JSON.stringify(urlContents)}
+      Based on the following query: "${userQuery}", create a well-structured, properly formatted response using the provided sources.
 
-        Ensure that each piece of information in the report is referenced by a number link references
-        associating correctly with the reference url number in the reference section.
-        Citations should be clickable markdown links, e.g: [1](https://firstsource.com), [2](https://secondsource.com), etc.
-        Only use information from the provided sources.
+      # Formatting Requirements
+      1. Use consistent markdown formatting throughout the entire response
+      2. Each new section should start with ##
+      3. Use bullet points (-) for lists, maintaining consistent indentation
+      4. Leave one blank line between sections and paragraphs
+      5. Tables should be properly aligned if used
 
-        References:
-        - End with a "References" section
-        - List all sources in numerical order
-        - Format each reference as:
-          1. [firstsource](https://firstsource.com)
-          2. [secondsource](https://secondsource.com)
-          ...
-          only the fonts used.
-      `;
+      # Citation and Reference Rules
+      1. CRITICAL: Each piece of information MUST have an inline citation
+      2. Citations format: [n](url) where n is the source number
+      3. Place citations IMMEDIATELY after the relevant information
+      4. Multiple sources for one statement: [1](url1)[2](url2)
+      5. DO NOT repeat the same citation in consecutive sentences
+      6. Use numerical order for first appearance of each source
+      7. When referencing information from multiple sources, combine the citations
 
-    let urlContentString = "";
-    urlContents.forEach((result, index) => {
-      urlContentString += `Source ${index + 1}: ${result.url}\n\n${
-        result.rawContent
-      }\n\n`;
-    });
+      # Reference Section Format
+      The reference section must:
+      1. Start with ## References
+      2. List sources in numerical order
+      3. Use this exact format for each reference:
+         n. [source](url)
+      4. No duplicate references
+      5. Include ONLY sources that were cited in the text
+      
+      # Sources Content
+      ${urlContents.map((result, index) => 
+        `Source ${index + 1}: ${result.url}\n${result.rawContent}\n`
+      ).join('\n')}
+
+      # Example of Proper Formatting:
+      ## Title
+      This topic has shown significant developments [1](url1). Recent studies have demonstrated additional findings [2](url2).
+
+      ## Key Findings
+      - Research indicates primary factors [1](url1)
+      - Additional studies show correlating results [3](url3)
+      - Combined analysis from multiple sources [1](url1)[2](url2) suggests...
+
+      ## References
+      1. [source name](url1)
+      2. [source name](url2)
+      3. [source name](url3)
+
+      STRICT REQUIREMENTS:
+      - Reference EVERY piece of information
+      - NO duplicate references
+      - NO information from outside the provided sources
+      - MAINTAIN consistent formatting throughout
+    `;
 
     return [
       {
         role: "system",
-        content:
-          "You are an AI assistant that writes detailed and informative search result reports based on provided data.",
+        content: "You are a precise content formatter focusing on consistent markdown structure and accurate source citation. Your primary goal is to maintain formatting consistency and proper reference management throughout the response.",
       },
       {
         role: "user",
-        content: contentTemplate.replace("{url_contents}", urlContentString),
+        content: contentTemplate,
       },
     ];
   }

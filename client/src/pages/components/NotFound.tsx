@@ -1,6 +1,4 @@
-
 import { Alert,  AlertTitle,  Box } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
 import { theme } from '../../App';
 
 interface ErrorAlertProps {
