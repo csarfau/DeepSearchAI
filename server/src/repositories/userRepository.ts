@@ -89,17 +89,13 @@ export default class UserRepository implements IUserRepository {
         });
     }
 
-    public async updateUsersThemes(registers: string[], themes: string[]):Promise<Array<IUserTheme>> {
-        if (registers.length !== themes.length) {
-            throw new CustomError(400, 'The number of registers and themes must be equal.');
-        }
-
+    public async updateUsersThemes(themes: IUserTheme[]):Promise<Array<IUserTheme>> {
         return await db.transaction(async trx => {
-            const updatePromises = registers.map((registerID, index) => {
-            const newThemeID = themes[index];
+            const updatePromises = themes.map(theme => {
+
             return trx('users_theme')
-                .where({ id: registerID })
-                .update({ theme_id: newThemeID })
+                .where({ id: theme.id })
+                .update({ theme_id: theme.theme_id })
                 .returning('*');
             });
     
@@ -107,6 +103,12 @@ export default class UserRepository implements IUserRepository {
             
             return updatedResults.flat();
         });
+    }
+
+    public async getUserFullRegistreUserThemes(userId: string):Promise<Array<IUserTheme>>{
+        return await db('users_theme')
+            .select('id', 'user_id', 'theme_id')
+            .where({user_id: userId})
     }
 
     public async getUsersThemes(userID: string): Promise<Array<string>> {
