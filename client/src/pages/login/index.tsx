@@ -61,7 +61,6 @@ const LoginPage = () => {
   };
 
   const handleForgotPassword = async () => {
-    console.log(forgotEmail);
     setLoading(true);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(!forgotEmail) {
