@@ -1,26 +1,15 @@
-# Use Node.js 18 Alpine as the base image
-FROM node:18-alpine
-
-# Set the working directory
+# Stage 1: Build
+FROM node:18-alpine as build
 WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
-
-# Install dependencies
+COPY package*.json ./
 RUN npm install
-
-# Copy the rest of the application code
 COPY . .
-
-# Build the application
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN npm run build
 
-# Install a simple HTTP server to serve static content
-RUN npm install -g http-server
-
-# Expose port 3000
-EXPOSE 3000
-
-# Start the HTTP server
-CMD ["http-server", "dist", "-p", "3000"]
+# Stage 2: Production
+FROM nginx:alpine
+RUN rm -rf /usr/share/nginx/html/*
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

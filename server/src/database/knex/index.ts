@@ -1,13 +1,9 @@
-import knex from "knex";
-import { development, production } from "./envirolment";
+import { config } from "dotenv";
+import path from "path";
+import knex from 'knex';
 
-const getEnvirolment = () => {
-  switch (process.env.NODE_ENV) {
-    case "prod":
-      return production;
-    default:
-      return development;
-  }
-};
+config({ path: path.join(__dirname, "../../../.env") });
 
-export const db = knex(getEnvirolment());
+const knexConfig = require("./knexfile");
+
+export const db = knex(knexConfig);

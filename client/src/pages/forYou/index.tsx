@@ -10,6 +10,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { iconsPath } from '../components/Icons';
 import { theme } from '../../App';
 import { SuggestionThemes } from '../chat/partial/SuggestionCard';
+import defaultImage from '@/assets/images/default-image.svg';
 
 const ForYouPage = () => {
     const [data, setData] = useState<Array<Suggestion>>();
@@ -50,7 +51,7 @@ const ForYouPage = () => {
             <Card sx={{ maxWidth: 345, height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardMedia
                     sx={{ height: 140 }}
-                    image={props.imageUrl || '/src/assets/images/default-image.svg'}
+                    image={props.imageUrl || defaultImage}
                     title={props.title}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
@@ -106,7 +107,7 @@ const ForYouPage = () => {
                     {currentCards.map((props, index) => (
                         <Grid key={index}>
                             <MediaCard
-                                imageUrl={props.imageUrl || '/src/assets/images/default-image.svg'}
+                                imageUrl={props.imageUrl || defaultImage}
                                 title={props.title}
                                 summary={props.summary}
                                 link={props.link}
