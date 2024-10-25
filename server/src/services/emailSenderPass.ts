@@ -29,7 +29,7 @@ const createEmailToRecoverPassword = async (id: string, email: string, definedTh
     </body>
     </html>`
 
-    const subject = 'Redefinição de senha';
+    const subject = 'Reset password';
     await sendEmail(email, subject, html);
 }
 
