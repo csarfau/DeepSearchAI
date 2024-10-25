@@ -76,8 +76,19 @@ export default class UserController {
       user.password = await bcrypt.hash(password, 10);
     }
 
+    const updatedUser = await userRepository.updateUserById(user);
+
+    const token = createToken(
+      {
+        id: updatedUser.id as string,
+        email: updatedUser.email as string,
+        definedTheme: updatedUser.defined_theme as boolean,
+      },
+      { expiresIn: "1d" }
+    );
+
     res.status(200).json({
-      data: await userRepository.updateUserById(user),
+      data: token,
     });
   }
 

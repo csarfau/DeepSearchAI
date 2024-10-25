@@ -37,7 +37,7 @@ export default class UserRepository implements IUserRepository {
         return user;
     }
 
-    public async updateUserById(user: IUser): Promise<Partial<IUser> | undefined > {
+    public async updateUserById(user: IUser): Promise<Partial<IUser>> {
         const dataToUpdate:Partial<IUser> = {
             email: user.email
         }
@@ -47,7 +47,7 @@ export default class UserRepository implements IUserRepository {
         const updatedUser = await db('users')
             .where('id', user.id)
             .update(dataToUpdate)
-            .returning('*')
+            .returning(['id', 'email', 'defined_theme'])
 
         return updatedUser[0]
     }
