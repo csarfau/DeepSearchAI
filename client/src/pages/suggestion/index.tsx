@@ -14,7 +14,7 @@ const SuggestionPage = () => {
     const theme = useTheme();
     const [themesSuggestions, setThemesSuggestions] = useState<Array<ITheme>>([]);
     const [loading, setLoading] = useState(true);
-    const [themeDefinition, setThemeDefinition] = useState<Array<string>>([]); 
+    const [themeDefinition, setThemeDefinition] = useState<Array<string>>([]);
     const [isVisible, setIsVisible] = useState(false);
     const showToast = useToast();
     const { user, token, isLoading: isUserLoading} = useUser();

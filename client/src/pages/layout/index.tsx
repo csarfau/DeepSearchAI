@@ -26,7 +26,7 @@ const AuthenticatedLayout = () => {
             const apiClient = createApiClient({ token, userId: user.id });
             const response = await apiClient.getLatestQueries() as ApiResponse;
             
-            if (response.error) {
+            if (response.error && !response.error.includes("504")) {
                 showToast(response.error);
                 return;
             }
