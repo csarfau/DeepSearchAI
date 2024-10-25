@@ -26,13 +26,13 @@ export const UserProvider: React.FC<{children: ReactNode}> = ({ children }) => {
     const setToken = useCallback((newToken: string | null) => {
         setTokenState(newToken);
         if (newToken) {
+            
             localStorage.setItem('token', newToken);
             try {
                 const decodedUser = jwtDecode<IUser>(newToken);
                 setUser(decodedUser);
                 localStorage.setItem('user', JSON.stringify(decodedUser));
             } catch (error) {
-                console.error('Failed to decode token', error);
                 setUser(null);
                 localStorage.removeItem('user');
             }

@@ -1,41 +1,56 @@
-import { Box, IconButton, Input, Typography } from "@mui/material";
+import { Box, IconButton, Input, Typography, Button } from "@mui/material";
 import { theme } from "../../App";
-import { Person } from '@mui/icons-material';
+import { Person, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useUser } from "../../hooks/useUser";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { createApiClient } from "../../api/fetch";
 import useToast from "../../hooks/useToast";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
 import PasswordOutlinedIcon from '@mui/icons-material/PasswordOutlined';
 
-interface IThemes {
-    id: string,
-    name: string
-}
-
 const ProfilePage = () => {
-    const { user, token, isLoading: isLoadingUser } = useUser();
+    const { user, token, setToken } = useUser();
     const showToast = useToast();
-    // const [ updateUser, setUpdateUser ] = useState<IUpdateUser>({newThemes: null})
-    const [ themes, setThemes] = useState<Array<IThemes>>([]);
+
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
     const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+    const [isUpdatingPass, setIsUpdatingPass] = useState(false);
+    const [newEmail, setNewEmail] = useState('');
+    const [newPassword, setNewPassword] = useState('');
 
-    const getThemes = async () => {
+    const handleClickShowRegisterPassword = () => setShowRegisterPassword((show) => !show);
 
-        if (!isLoadingUser && token && user ) {
-            const apiClient = createApiClient({token, userId: user.id });
-            const response = await apiClient.getUsersTheme();
-            if (response.error) return showToast(response.error, 'error');                           
-            setThemes(response.data);
+    const handleSubmit = async () => {
+
+        if (token && user) {
+            const clientApi = createApiClient({token, userId: user.id})
             
-        }
-    }
+            const response = await clientApi.updateUser({
+                ...(newEmail && { email: newEmail }),
+                ...(newPassword && { password: newPassword })
+            })
 
-    useEffect(() => {
-        getThemes();
-    }, [isLoadingUser])
+            if (response.error) {
+                showToast(response.error, 'error');
+                return
+            }
+
+            showToast('Successful update');
+            setToken(response.data);
+        }
+
+        setIsUpdatingEmail(false);
+        setIsUpdatingPass(false);
+        setNewPassword('');
+    };
+
+    const resetFields = () => {
+        setIsUpdatingEmail(false);
+        setIsUpdatingPass(false);
+        setNewEmail('');
+        setNewPassword('');
+    };
 
     return (
         <Box sx={{ minWidth: {md: '40rem'}, border: '1px solid #dadada', padding: '3rem 2rem 4rem', borderRadius: '0.5rem'}}>
@@ -50,9 +65,9 @@ const ProfilePage = () => {
                     Profile
                 </Typography>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <Box sx={{
-                    height: '3rem',
+                    minHeight: '3rem',
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
@@ -64,47 +79,24 @@ const ProfilePage = () => {
                         <MailOutlineIcon sx={{ width: '1rem'}}/>
                         <Typography>Email</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center'}}>
-                        {isUpdatingEmail ?
-                            <Input placeholder="enter your new email ..." sx={{"::placeholder": {fontSize: '8px'}}}/>
-                            :
-                            <Typography variant="subtitle2" >{user?.email}</Typography>
-                        }
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                        {isUpdatingEmail ? (
+                            <Input 
+                                placeholder="enter your new email ..." 
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                sx={{"::placeholder": {fontSize: '8px'}}}
+                            />
+                        ) : (
+                            <Typography variant="subtitle2">{user?.email}</Typography>
+                        )}
                         <IconButton onClick={() => setIsUpdatingEmail(prev => !prev)}>
                             <EditNoteIcon/>
                         </IconButton>
                     </Box>
-                </Box>                
-                <Box sx={{
-                    height: '3rem',
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    borderBottom: '1px solid #dadada',
-                    py: '1rem'
-                }}>
-                    <Box sx={{ display: 'flex', gap: '0.5rem' }}>
-                        <SettingsApplicationsOutlinedIcon sx={{ width: '1rem'}}/>  
-                        <Typography >Suggestion Topics</Typography>   
-                    </Box>                   
-                    <Box sx={{ display: 'flex', gap: '1rem', alignItems: 'center'}}>
-                        <Box sx={{ display: 'flex', gap: '1rem'}}>
-                            {themes.map((theme, index) => (
-                                <Typography  variant="subtitle2" key={index}>
-                                    {theme.name}
-                                </Typography>
-                            ))
-
-                            }
-                        </Box>
-                        <IconButton>
-                            <EditNoteIcon/>
-                        </IconButton>
-                    </Box>
-
                 </Box>
                 <Box sx={{
-                    height: '3rem',
+                    minHeight: '3rem',
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
@@ -115,14 +107,59 @@ const ProfilePage = () => {
                         <PasswordOutlinedIcon sx={{ width: '1rem'}} />
                         <Typography>Password</Typography>
                     </Box>
-                    <IconButton>
-                        <EditNoteIcon/>
-                    </IconButton>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                        {isUpdatingPass ? (
+                            <>
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowRegisterPassword}
+                                    edge="end"
+                                >
+                                    {showRegisterPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                                <Input  
+                                    type={showRegisterPassword ? 'text' : 'password'} 
+                                    placeholder="enter your new password ..." 
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    sx={{"::placeholder": {fontSize: '8px'}}}
+                                />
+                            </>
+                        ) : (
+                            <Typography variant="subtitle2">********</Typography>
+                        )}
+                        <IconButton onClick={() => setIsUpdatingPass(prev => !prev)}>
+                            <EditNoteIcon/>
+                        </IconButton>
+                    </Box>
                 </Box>
+                {(newEmail || newPassword) && (
+                    <Box sx={{ 
+                        position: 'absolute',
+                        bottom: '-3rem', 
+                        display: 'flex', 
+                        gap: '1rem', 
+                        justifyContent: 'flex-end',
+                        mt: '1rem'
+                    }}>
+                        <Button 
+                            variant="outlined" 
+                            color="error"
+                            onClick={resetFields}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            onClick={() => handleSubmit()}
+                        >
+                            Save Changes
+                        </Button>
+                    </Box>
+                )}
             </Box>
-
         </Box>
-    )
-}
+    );
+};
 
 export default ProfilePage;
