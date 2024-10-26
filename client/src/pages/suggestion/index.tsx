@@ -70,6 +70,7 @@ const SuggestionPage = () => {
             alignItems: { sm: 'center' },
             overflowY: 'auto', 
             WebkitOverflowScrolling: 'touch',
+            background: '#ffffff'
         }}
     >
         <Paper

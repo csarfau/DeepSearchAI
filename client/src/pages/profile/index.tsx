@@ -27,8 +27,8 @@ const ProfilePage = () => {
             const clientApi = createApiClient({token, userId: user.id})
             
             const response = await clientApi.updateUser({
-                ...(newEmail && { email: newEmail }),
-                ...(newPassword && { password: newPassword })
+                ...(newPassword && { password: newPassword }),
+                email: newEmail || user.email
             })
 
             if (response.error) {

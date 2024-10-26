@@ -1,4 +1,4 @@
-import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
+import { Box, Paper, TextField, Typography, Button, Switch, FormControlLabel, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useGoogleLogin } from '@react-oauth/google';
 import { createApiClient } from "../../api/fetch";
@@ -9,29 +9,30 @@ import { useUser } from "../../hooks/useUser";
 import { useEffect, useState } from "react";
 import useToast from "../../hooks/useToast";
 import logo from "@/assets/icons/logo.svg";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 
 const LoginPage = () => {
-  const [registerChoice, setRegisterChoice] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [emailNotification, setEmailNotification] = useState(true);
-  const [email, setEmail] = useState('');
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
   const [registerErrors, setRegisterErrors] = useState({ registerEmail: '', registerPassword: '', confirmPassword: '' });
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [googleLoginAttempted, setGoogleLoginAttempted] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isFinishedRegister, setIsFinishedRegister] = useState(false);
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [emailNotification, setEmailNotification] = useState(true);
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerChoice, setRegisterChoice] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [forgotEmail, setForgotEmail] = useState('');
   const [modalOpen, setModalOpen] = useState(false); 
   const [loading, setLoading] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [googleLoginAttempted, setGoogleLoginAttempted] = useState(false);
-  const theme = useTheme();
-  const showToast = useToast();
-  const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const { setToken, user } = useUser();
+  const navigate = useNavigate();
+  const showToast = useToast();
+  const theme = useTheme();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowRegisterPassword = () => setShowRegisterPassword((show) => !show);
@@ -51,10 +52,6 @@ const LoginPage = () => {
 
   const handleToggle = () => {
     setRegisterChoice(!registerChoice);
-  };
-
-  const handleOpenModal = () => {
-    setModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -77,11 +74,14 @@ const LoginPage = () => {
 
     try {
       const response = await nonAuthClient.sendForgotPasswordEmail(forgotEmail);
-      if(response.error) return showToast(response.error, 'error');
-
+      if(response.error) {
+        setLoading(false);
+        return showToast(response.error, 'error');
+      }
       handleCloseModal();
       return showToast('Recovery e-mail send!', 'success');
     } catch (error) {
+      setLoading(false);
       return showToast(error as string, 'error');
     }
   };
@@ -131,7 +131,7 @@ const LoginPage = () => {
 
     if (!registerPassword) {
       newErrors.registerPassword = 'Password is required!';
-    } else if (registerPassword.length < 6) {
+    } else if (registerPassword.length < 8) {
       newErrors.registerPassword = 'Password must be at least 6 characters';
     }
 
@@ -159,6 +159,13 @@ const LoginPage = () => {
         return navigate('/chat');
     } catch (error) {
       return showToast(error as string, 'error');
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        handleLogin();
     }
   };
 
@@ -215,6 +222,13 @@ const LoginPage = () => {
 
     } catch (error) {
       return showToast(error as string, 'error');
+    }
+  };
+
+  const handleRegisterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        handleRegister();
     }
   };
 
@@ -325,6 +339,7 @@ const LoginPage = () => {
                   type={ showPassword ? 'text' : 'password' }
                   value={ password }
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyPress}
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
@@ -359,7 +374,7 @@ const LoginPage = () => {
               alignItems: 'center',
               pt: '0.7rem' 
             }}>
-              <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }} onClick={handleOpenModal}>
+              <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }} onClick={()=> setModalOpen(true)}>
                 Forgot your password?
               </Typography>
               <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary, cursor: 'pointer' }} onClick={handleToggle}>
@@ -368,35 +383,13 @@ const LoginPage = () => {
             </Box>
           </Box>
           {/* Modal de Esqueci a Senha */}
-          <Dialog open={modalOpen} onClose={handleCloseModal}>
-            <DialogTitle>Forgot Password</DialogTitle>
-            <DialogContent>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Email"
-                type="email"
-                fullWidth
-                variant="outlined"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseModal} color="primary" disabled={loading ? true : false}> 
-                Cancelar
-              </Button>
-              {loading ? 
-                <Box>
-                  <CircularProgress /> 
-                </Box>
-                : 
-                <Button onClick={handleForgotPassword} color="primary">
-                  Enviar
-                </Button>
-                }
-            </DialogActions>
-          </Dialog>
+          <ForgotPasswordModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            onSubmit={handleForgotPassword}
+            loading={loading}
+            setForgotEmail={setForgotEmail}
+          />
           <Box>
           </Box>
           <Box sx={{
@@ -595,6 +588,7 @@ const LoginPage = () => {
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      onKeyDown={handleRegisterKeyPress}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -653,9 +647,6 @@ const LoginPage = () => {
                           },
                       }}}
                     />
-                  </Typography>
-                  <Typography variant="subtitle2" sx={{ cursor: 'pointer' }}>
-                    Privacy Police
                   </Typography>
                 </Box>
                 <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary }}>Already has account?
