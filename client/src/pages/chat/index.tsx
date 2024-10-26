@@ -47,6 +47,13 @@ const ChatPage = () => {
         setIsAnsweringUsersQuery(true);
         setUsersQuery(queryRef.current.value);
     }
+
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleUsersQuery();
+        }
+      };
         
     return (
         <>
@@ -89,7 +96,7 @@ const ChatPage = () => {
                         width: { xs: '100%', sm:'80%' },
                         alignSelf: 'center'
                     }}>
-                        <textarea ref={queryRef} style={{ background: '#FFFFFF', color: 'black' }} placeholder="Search for anything ..."/>
+                        <textarea ref={queryRef} style={{ background: '#FFFFFF', color: 'black' }} placeholder="Search for anything ..." onKeyDown={handleKeyPress}/>
                         <IconButton onClick={() => handleUsersQuery()} aria-label="send">
                             <Send sx={{ color: theme.palette.primary.main }}/>
                         </IconButton>

@@ -23,17 +23,20 @@ const AuthenticatedLayout = () => {
 
     const getRecentQueries = async () => {
         if (!isUserLoading && user && token) {
-            const apiClient = createApiClient({ token, userId: user.id });
-            const response = await apiClient.getLatestQueries() as ApiResponse;
-            
-            if (response.error && !response.error.includes("504")) {
-                showToast(response.error);
-                return;
-            }
-            
-            updateAllList(response.data);
-            setIsEmptyHistory(response.data.length === 0);
-            setIsLoading(false);
+            try {
+                const apiClient = createApiClient({ token, userId: user.id });
+                const response = await apiClient.getLatestQueries() as ApiResponse;
+                
+                if (response.error && !response.error.includes("504")) {
+                    showToast(response.error);
+                    return;
+                }
+                
+                updateAllList(response.data);
+                setIsEmptyHistory(response.data.length === 0);
+                setIsLoading(false);
+                
+            } catch (error) {}
         }
     };
 
